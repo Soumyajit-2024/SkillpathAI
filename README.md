@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SkillPath AI — Complete Project Package
 
 ## What's in this ZIP
@@ -87,3 +88,7 @@ MONGO_URL=mongodb://localhost:27017
 - **AI**: Claude Sonnet (Anthropic API)
 - **NLP**: spaCy, pdfplumber
 
+=======
+# SkillpathAI
+Skill Path AI is an intelligent platform that identifies skill gaps and provides personalized learning paths based on industry needs. It analyzes user data to recommend relevant courses and track progress. The system helps students and professionals develop targeted skills, enabling efficient career growth through structured, data-driven guidance.
+>>>>>>> 006e9b74c1687c72816b7372363ec41a19b905a0
