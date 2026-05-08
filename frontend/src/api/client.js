@@ -118,16 +118,16 @@ export const api = {
   },
 
   /* ── Notifications ────────────────────────────────────── */
-  notifications: {
-    list: () => req("GET",  "/notifications/"),
-    markRead: id => req("PATCH", `/notifications/${id}/read`),
-    markAllRead: () => req("PATCH", "/notifications/read-all"),
-  },
-};
+ notifications: {
+  list: () => req("GET", "/notifications/"),
+  markRead: id => req("PATCH", `/notifications/${id}/read`),
+  markAllRead: () => req("PATCH", "/notifications/read-all"),
+},
 
-  /* ── Config / API Keys ────────────────────────────────── */
-  config: {
-    status:  ()     => req("GET",  "/config/status"),
-    testKey: ()     => req("GET",  "/config/test-key"),
-    update:  data   => req("POST", "/config/update", data),
-  },
+/* ── Config / API Keys ────────────────────────────────── */
+config: {
+  status: () => req("GET", "/config/status"),
+  testKey: () => req("GET", "/config/test-key"),
+  update: data => req("POST", "/config/update", data),
+},
+};
