@@ -1,10 +1,12 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from bson import ObjectId
 import os
+
+router = APIRouter()
 
 SECRET_KEY  = os.getenv("JWT_SECRET", "changeme-use-a-strong-secret-in-production")
 ALGORITHM   = "HS256"
