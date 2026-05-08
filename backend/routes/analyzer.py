@@ -9,7 +9,7 @@ from middleware.auth import get_current_user
 from services.resume_parser import parse_resume_full
 from services.github_analyzer import analyze_github_profile, map_github_langs_to_skills
 from services.ai_service import extract_skills_from_resume, analyze_resume_quality
-from main import limiter
+from limiter import limiter
 
 router   = APIRouter()
 _pool    = ThreadPoolExecutor(max_workers=3)
