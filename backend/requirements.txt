@@ -1,0 +1,36 @@
+# ── Web Framework ────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+
+# ── Database ─────────────────────────────────
+motor==3.4.0
+pymongo==4.7.2
+
+# ── Auth ─────────────────────────────────────
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# ── Data Validation ──────────────────────────
+pydantic[email]==2.7.1
+python-dotenv==1.0.1
+
+# ── HTTP Client ──────────────────────────────
+httpx==0.27.0
+
+# ── AI / NLP ─────────────────────────────────
+spacy==3.7.4
+# After install run: python -m spacy download en_core_web_sm
+
+# ── PDF Processing ────────────────────────────
+pdfplumber==0.11.1
+python-multipart==0.0.9
+
+# ── Reliability ──────────────────────────────
+tenacity==8.3.0
+slowapi==0.1.9
+
+# ── File Storage ─────────────────────────────
+cloudinary==1.40.0
+
+# ── Email ─────────────────────────────────────
+sendgrid==6.11.0

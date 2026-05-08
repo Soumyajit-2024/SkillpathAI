@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SkillPath AI — Test Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#040812; --bg2:#080f1e; --bg3:#0d1829; --bg4:#111f35;
+  --border:rgba(56,189,248,.1); --b2:rgba(56,189,248,.22); --b3:rgba(56,189,248,.42);
+  --cyan:#38bdf8; --cdim:rgba(56,189,248,.12); --cglow:rgba(56,189,248,.35);
+  --green:#4ade80; --gdim:rgba(74,222,128,.1);
+  --amber:#fbbf24; --adim:rgba(251,191,36,.1);
+  --red:#f87171; --rdim:rgba(248,113,113,.1);
+  --purple:#a78bfa; --pdim:rgba(167,139,250,.1);
+  --teal:#2dd4bf; --tdim:rgba(45,212,191,.1);
+  --text:#e2eeff; --t2:#8ca9c8; --t3:#4a6b8a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+h1,h2,h3,h4{font-family:'Syne',sans-serif;font-weight:700;line-height:1.2}
+h1{font-size:clamp(1.6rem,4vw,2.4rem)}
+h2{font-size:clamp(1.15rem,3vw,1.5rem)}
+h3{font-size:clamp(1rem,2vw,1.15rem)}
+p{font-size:.93rem;line-height:1.7;color:var(--t2)}
+a{color:var(--cyan);text-decoration:none}
+input,textarea,select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.88rem;padding:10px 14px;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cdim)}
+input::placeholder,textarea::placeholder{color:var(--t3)}
+select option{background:var(--bg3)}
+textarea{resize:vertical}
+button{cursor:pointer;font-family:'Outfit',sans-serif;border:none;outline:none;transition:all .15s}
+button:disabled{opacity:.5;cursor:not-allowed}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+.sidebar{width:230px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.main{flex:1;margin-left:230px;min-height:100vh;padding:26px 28px}
+.page{max-width:900px;margin:0 auto}
+.bg-grid{background-image:linear-gradient(rgba(56,189,248,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.025) 1px,transparent 1px);background-size:36px 36px}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+.orb1{width:400px;height:400px;background:rgba(56,189,248,.05);top:-100px;right:-80px}
+.orb2{width:300px;height:300px;background:rgba(74,222,128,.04);bottom:50px;left:-60px}
+
+/* Nav */
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;font-size:.82rem;font-weight:500;color:var(--t3);text-decoration:none;border-left:2px solid transparent;transition:all .13s;cursor:pointer;background:transparent;width:100%;text-align:left}
+.nav-item.active{background:var(--cdim);color:var(--cyan);border-left-color:var(--cyan)}
+.nav-item:hover:not(.active){background:rgba(255,255,255,.03);color:var(--t2)}
+
+/* Cards */
+.card{background:rgba(13,24,41,.85);border:1px solid var(--border);border-radius:14px;padding:18px;backdrop-filter:blur(12px);transition:border-color .2s,box-shadow .2s}
+.card:hover{border-color:var(--b2)}
+.card-glow{border-color:var(--b2)!important;box-shadow:0 0 24px rgba(56,189,248,.08)}
+
+/* Buttons */
+.btn-primary{background:var(--cyan);color:#020810;font-weight:700;font-size:.85rem;padding:10px 22px;border-radius:10px;letter-spacing:.02em;display:inline-flex;align-items:center;gap:7px}
+.btn-primary:hover:not(:disabled){box-shadow:0 0 22px var(--cglow);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--cyan);border:1px solid var(--b2);font-size:.82rem;padding:8px 18px;border-radius:10px;display:inline-flex;align-items:center;gap:7px}
+.btn-ghost:hover:not(:disabled){background:var(--cdim);border-color:var(--b3)}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;font-size:.65rem;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap;letter-spacing:.04em;font-family:'DM Mono',monospace}
+
+/* Progress */
+.progress-track{height:6px;background:var(--bg4);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+
+/* Grid helpers */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.fade-up{animation:fadeUp .32s ease forwards}
+.spin{animation:spin .8s linear infinite}
+.dot-live{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;display:inline-block}
+
+/* Tabs */
+.tab-nav{display:flex;gap:4px;background:var(--bg3);padding:4px;border-radius:10px;width:fit-content;flex-wrap:wrap}
+.tab-item{padding:6px 16px;border-radius:7px;font-size:.8rem;font-weight:500;color:var(--t2);background:transparent;border:none;transition:all .14s;cursor:pointer}
+.tab-item.active{background:var(--cyan);color:#020810;font-weight:700}
+
+/* Chat bubbles */
+.bubble-user{background:var(--cyan);color:#020810;border-radius:16px 16px 4px 16px;padding:10px 15px;max-width:80%;font-size:.85rem;font-weight:500}
+.bubble-ai{background:var(--bg3);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:10px 15px;max-width:85%;font-size:.85rem;line-height:1.65}
+
+/* Auth */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden}
+.auth-card{width:100%;max-width:420px;position:relative;z-index:1}
+
+/* Page sections */
+.page-hidden{display:none!important}
+.section-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+
+/* Spinner */
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top:2px solid var(--cyan);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:10px;font-size:.85rem;font-weight:500;z-index:999;animation:fadeUp .3s ease}
+.toast-success{background:var(--gdim);border:1px solid rgba(74,222,128,.3);color:var(--green)}
+.toast-error{background:var(--rdim);border:1px solid rgba(248,113,113,.3);color:var(--red)}
+.toast-info{background:var(--cdim);border:1px solid var(--b2);color:var(--cyan)}
+
+/* Skill bar */
+.skill-bar-wrap{margin-bottom:14px}
+
+/* Mobile */
+.mobile-topbar{display:none;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform .28s}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .main{margin-left:0;padding:0}
+  .mobile-topbar{display:flex}
+  .page{padding:16px}
+}
+
+/* Score ring animation */
+circle.score-fill{transition:stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1)}
+
+/* Interview stages */
+.q-progress-bar{height:4px;flex:1;border-radius:99px;transition:background .3s}
+
+/* ── Light theme ─────────────────────────────────────────── */
+[data-theme="light"]{
+  --bg:#f0f5ff;--bg2:#e6edf8;--bg3:#dae3f4;--bg4:#cdd8ee;
+  --border:rgba(56,189,248,.22);--b2:rgba(56,189,248,.38);--b3:rgba(56,189,248,.58);
+  --cdim:rgba(56,189,248,.12);--cglow:rgba(56,189,248,.35);
+  --gdim:rgba(22,163,74,.10);--adim:rgba(217,119,6,.10);
+  --rdim:rgba(220,38,38,.10);--pdim:rgba(124,58,237,.10);
+  --text:#07142a;--t2:#1e3a5f;--t3:#6b90b4;
+}
+[data-theme="light"] .card{background:rgba(255,255,255,.88)}
+[data-theme="light"] .bg-grid{background-image:linear-gradient(rgba(56,189,248,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.06) 1px,transparent 1px);background-size:36px 36px}
+[data-theme="light"] .orb1{background:rgba(56,189,248,.10)}
+[data-theme="light"] .orb2{background:rgba(74,222,128,.07)}
+[data-theme="light"] .nav-item:hover:not(.active){background:rgba(0,0,0,.04);color:var(--t2)}
+[data-theme="light"] .btn-primary{color:#fff}
+[data-theme="light"] select option{background:var(--bg3);color:var(--text)}
+
+/* Smooth transitions */
+*,*::before,*::after{transition:background-color .22s ease,border-color .22s ease,color .18s ease,box-shadow .22s ease}
+</style>
+</head>
+<body class="bg-grid">
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AUTH SCREEN  (Sign In / Create Account / Forgot Password)
+═══════════════════════════════════════════════════════════ -->
+<div id="screen-auth" class="auth-wrap">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="auth-card fade-up">
+
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#38bdf8,#4ade80);display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:800;color:#020810;margin:0 auto 14px;box-shadow:0 0 28px rgba(56,189,248,.3);font-family:'Syne',sans-serif">S</div>
+      <h1 style="font-size:1.5rem;margin-bottom:4px" id="auth-heading">Welcome back</h1>
+      <p style="font-size:.82rem;margin:0" id="auth-subheading">Sign in to your SkillPath AI account</p>
+    </div>
+
+    <!-- Tab switcher -->
+    <div style="display:flex;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:20px;border:1px solid var(--border)">
+      <button id="tab-signin"  onclick="switchAuthTab('signin')"  style="flex:1;padding:8px;border-radius:7px;font-size:.85rem;font-weight:600;border:none;background:var(--cyan);color:#020810;transition:all .15s;cursor:pointer">Sign In</button>
+      <button id="tab-signup"  onclick="switchAuthTab('signup')"  style="flex:1;padding:8px;border-radius:7px;font-size:.85rem;font-weight:500;border:none;background:transparent;color:var(--t2);transition:all .15s;cursor:pointer">Create Account</button>
+    </div>
+
+    <!-- ── SIGN IN FORM ── -->
+    <div id="form-signin" class="card card-glow">
+      <div id="signin-error" style="display:none;background:var(--rdim);border:1px solid rgba(248,113,113,.3);border-radius:8px;padding:9px 13px;color:var(--red);font-size:.83rem;margin-bottom:14px"></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Email Address</label>
+          <input id="login-email" type="email" placeholder="you@example.com" value=""/>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <label style="font-size:.68rem;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Password</label>
+            <span onclick="switchAuthTab('forgot')" style="font-size:.75rem;color:var(--cyan);cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">Forgot password?</span>
+          </div>
+          <input id="login-password" type="password" placeholder="••••••••" value="" onkeydown="if(event.key==='Enter')doLogin()"/>
+        </div>
+        <button class="btn-primary" onclick="doLogin()" style="justify-content:center;margin-top:4px">Sign In →</button>
+        <div style="text-align:center;font-size:.82rem;color:var(--t3)">
+          Enter any email and password to explore the demo
+        </div>
+        <div style="position:relative;text-align:center;margin:2px 0">
+          <div style="height:1px;background:var(--border);position:absolute;top:50%;left:0;right:0"></div>
+          <span style="background:var(--bg3);padding:0 12px;font-size:.72rem;color:var(--t3);position:relative">OR</span>
+        </div>
+        <button onclick="switchAuthTab('signup')" style="width:100%;padding:10px;border-radius:10px;font-size:.85rem;font-weight:600;background:transparent;color:var(--cyan);border:1px solid var(--b2);transition:all .15s" onmouseover="this.style.background='var(--cdim)'" onmouseout="this.style.background='transparent'">
+          Create a new account →
+        </button>
+      </div>
+    </div>
+
+    <!-- ── CREATE ACCOUNT FORM ── -->
+    <div id="form-signup" style="display:none" class="card card-glow">
+      <div id="signup-error" style="display:none;background:var(--rdim);border:1px solid rgba(248,113,113,.3);border-radius:8px;padding:9px 13px;color:var(--red);font-size:.83rem;margin-bottom:14px"></div>
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Full Name</label>
+          <input id="reg-name" type="text" placeholder="Your full name"/>
+        </div>
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Email Address</label>
+          <input id="reg-email" type="email" placeholder="you@example.com"/>
+        </div>
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Password</label>
+          <input id="reg-password" type="password" placeholder="Minimum 8 characters"/>
+        </div>
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Confirm Password</label>
+          <input id="reg-confirm" type="password" placeholder="Re-enter your password" onkeydown="if(event.key==='Enter')doSignup()"/>
+        </div>
+        <button class="btn-primary" onclick="doSignup()" style="justify-content:center;margin-top:4px">Create Account &amp; Build Profile →</button>
+        <div style="position:relative;text-align:center;margin:2px 0">
+          <div style="height:1px;background:var(--border);position:absolute;top:50%;left:0;right:0"></div>
+          <span style="background:var(--bg3);padding:0 12px;font-size:.72rem;color:var(--t3);position:relative">Already have an account?</span>
+        </div>
+        <button onclick="switchAuthTab('signin')" style="width:100%;padding:10px;border-radius:10px;font-size:.85rem;font-weight:600;background:transparent;color:var(--cyan);border:1px solid var(--b2);transition:all .15s" onmouseover="this.style.background='var(--cdim)'" onmouseout="this.style.background='transparent'">
+          Sign in instead →
+        </button>
+      </div>
+    </div>
+
+    <!-- ── FORGOT PASSWORD FORM ── -->
+    <div id="form-forgot" style="display:none" class="card card-glow">
+      <div id="forgot-sent" style="display:none;background:var(--gdim);border:1px solid rgba(74,222,128,.3);border-radius:8px;padding:9px 13px;color:var(--green);font-size:.83rem;margin-bottom:14px">
+        ✅ Reset link sent! Check your email inbox.
+      </div>
+      <div id="forgot-form-inner" style="display:flex;flex-direction:column;gap:14px">
+        <div style="text-align:center;padding:8px 0 4px">
+          <div style="font-size:2.2rem;margin-bottom:8px">🔑</div>
+          <p style="margin:0;font-size:.85rem;color:var(--t2);line-height:1.6">Enter your email address and we'll send you a link to reset your password.</p>
+        </div>
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Email Address</label>
+          <input id="forgot-email" type="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')sendReset()"/>
+        </div>
+        <button class="btn-primary" onclick="sendReset()" style="justify-content:center">Send Reset Link →</button>
+        <button onclick="switchAuthTab('signin')" style="width:100%;padding:8px;border-radius:10px;font-size:.82rem;background:transparent;color:var(--t2);border:none;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
+          ← Back to Sign In
+        </button>
+      </div>
+    </div>
+
+    <p style="text-align:center;margin-top:14px;font-size:.72rem;color:var(--t3)">🔒 Frontend-only demo — no real backend needed</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SETUP / PROFILE BUILD SCREEN  (shown after signup)
+═══════════════════════════════════════════════════════════ -->
+<div id="screen-setup" style="display:none;min-height:100vh;background:var(--bg);position:relative;overflow-x:hidden">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div style="max-width:540px;margin:0 auto;padding:36px 20px;position:relative;z-index:1">
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#38bdf8,#4ade80);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#020810;margin:0 auto 12px">S</div>
+      <h2 style="margin-bottom:4px">Build your profile</h2>
+      <p style="margin:0;font-size:.85rem">Tell us about yourself so we can personalize everything for you</p>
+    </div>
+
+    <!-- Step progress -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:.78rem;color:var(--t2)" id="setup-step-label">Step 1 of 4 — Target Role</div>
+      <div style="font-size:.72rem;color:var(--cyan);font-family:'DM Mono',monospace" id="setup-step-count">1 / 4</div>
+    </div>
+    <div style="height:5px;background:var(--bg4);border-radius:99px;overflow:hidden;margin-bottom:24px">
+      <div id="setup-progress-bar" style="height:100%;width:25%;background:var(--cyan);border-radius:99px;transition:width .4s ease"></div>
+    </div>
+
+    <!-- Step panels -->
+    <!-- Step 1: Target Role -->
+    <div id="setup-step-1" class="card card-glow fade-up">
+      <div style="margin-bottom:16px">
+        <h3 style="margin-bottom:6px">What's your target role?</h3>
+        <p style="margin:0;font-size:.85rem">This drives all your skill gap analysis, roadmap, and recommendations.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px" id="role-grid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- Step 2: Skills & Goals -->
+    <div id="setup-step-2" style="display:none" class="card card-glow fade-up">
+      <div style="margin-bottom:16px">
+        <h3 style="margin-bottom:6px">Add your current skills</h3>
+        <p style="margin:0;font-size:.85rem">Select skills you already know. You can add custom ones too.</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px" id="skill-chips"></div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Or type a custom skill</label>
+        <div style="display:flex;gap:8px">
+          <input id="custom-skill-input" placeholder="e.g. Rust, Kotlin, Terraform..." style="flex:1" onkeydown="if(event.key==='Enter'){addCustomSkill();event.preventDefault()}"/>
+          <button class="btn-ghost" onclick="addCustomSkill()" style="flex-shrink:0;padding:8px 14px">Add +</button>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Your Career Goal</label>
+        <textarea id="setup-goal" rows="3" placeholder="e.g. Get a backend developer internship at a product startup by July 2025, then transition to a full-time SDE role..."></textarea>
+      </div>
+    </div>
+
+    <!-- Step 3: Academic Info -->
+    <div id="setup-step-3" style="display:none" class="card card-glow fade-up">
+      <div style="margin-bottom:16px">
+        <h3 style="margin-bottom:6px">Academic background</h3>
+        <p style="margin:0;font-size:.85rem">Helps map your subjects to skills and calculate placement readiness.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
+        <div style="grid-column:1/-1">
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">College / University</label>
+          <input id="setup-college" placeholder="Jadavpur University"/>
+        </div>
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Degree</label>
+          <input id="setup-degree" placeholder="B.Tech CSE"/>
+        </div>
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">CGPA</label>
+          <input id="setup-cgpa" type="number" step="0.1" min="0" max="10" placeholder="8.5"/>
+        </div>
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Graduation Year</label>
+          <input id="setup-year" type="number" placeholder="2025"/>
+        </div>
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Experience Level</label>
+          <select id="setup-exp">
+            <option value="">Select...</option>
+            <option>Student / Fresher</option>
+            <option>0–1 year</option>
+            <option>1–2 years</option>
+            <option>2–4 years</option>
+            <option>4+ years</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: GitHub + Summary -->
+    <div id="setup-step-4" style="display:none" class="card card-glow fade-up">
+      <div style="margin-bottom:16px">
+        <h3 style="margin-bottom:6px">GitHub &amp; final details</h3>
+        <p style="margin:0;font-size:.85rem">We scan your repos to auto-detect skills and score your portfolio.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:13px;margin-bottom:20px">
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">GitHub Profile URL</label>
+          <input id="setup-github" placeholder="https://github.com/your-username"/>
+        </div>
+        <div>
+          <label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">LinkedIn URL (optional)</label>
+          <input id="setup-linkedin" placeholder="https://linkedin.com/in/your-name"/>
+        </div>
+      </div>
+      <!-- Summary card -->
+      <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:10px;padding:14px;margin-bottom:6px">
+        <div style="font-size:.68rem;color:var(--cyan);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Profile Summary</div>
+        <div id="setup-summary" style="font-size:.83rem;color:var(--t2);line-height:1.8"></div>
+      </div>
+    </div>
+
+    <!-- Navigation buttons -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:10px">
+      <button id="setup-back-btn" onclick="setupBack()" style="padding:9px 20px;border-radius:10px;font-size:.85rem;background:transparent;color:var(--t2);border:1px solid var(--border);cursor:pointer;display:none;transition:all .15s" onmouseover="this.style.borderColor='var(--b2)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--t2)'">← Back</button>
+      <div></div>
+      <button id="setup-next-btn" onclick="setupNext()" class="btn-primary">Next →</button>
+    </div>
+    <button onclick="skipSetup()" style="display:block;width:100%;margin-top:10px;padding:8px;background:transparent;color:var(--t3);border:none;font-size:.78rem;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.6'" onmouseout="this.style.opacity='1'">Skip for now — I'll fill this later</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════════════════ -->
+<div id="screen-app" style="display:none" class="app">
+
+  <!-- Orbs -->
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <!-- ── SIDEBAR ── -->
+  <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+  <aside id="sidebar" class="sidebar">
+    <!-- Logo -->
+    <div style="padding:18px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#38bdf8,#4ade80);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#020810;font-family:'Syne',sans-serif">S</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:.92rem;font-weight:800">SkillPath</div>
+          <div style="font-size:.55rem;color:var(--t3);font-family:'DM Mono',monospace;letter-spacing:.08em">AI PLATFORM</div>
+        </div>
+      </div>
+    </div>
+    <!-- User info -->
+    <div style="padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div id="sb-avatar" style="width:34px;height:34px;border-radius:50%;background:var(--cdim);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--cyan);flex-shrink:0" id="sb-avatar">?</div>
+        <div>
+          <div id="sb-name" style="font-size:.82rem;font-weight:600">—</div>
+          <div id="sb-ready" style="font-size:.62rem;color:var(--t3);font-family:'DM Mono',monospace">—</div>
+        </div>
+      </div>
+      <div style="margin-top:7px">
+        <div class="progress-track" style="height:3px"><div id="sb-progress" class="progress-fill" style="width:0%;background:var(--cyan)"></div></div>
+      </div>
+    </div>
+    <!-- Nav items -->
+    <nav style="flex:1;padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:2px">
+      <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')"><span style="font-size:13px;width:16px;text-align:center">⊞</span><span style="flex:1">Dashboard</span></button>
+      <button class="nav-item" id="nav-profile" onclick="showPage('profile')"><span style="font-size:13px;width:16px;text-align:center">◎</span><span style="flex:1">Profile</span></button>
+      <button class="nav-item" id="nav-gap" onclick="showPage('gap')"><span style="font-size:13px;width:16px;text-align:center">◈</span><span style="flex:1">Skill Gap</span></button>
+      <button class="nav-item" id="nav-roadmap" onclick="showPage('roadmap')"><span style="font-size:13px;width:16px;text-align:center">⟶</span><span style="flex:1">Roadmap</span></button>
+      <button class="nav-item" id="nav-chat" onclick="showPage('chat')"><span style="font-size:13px;width:16px;text-align:center">◆</span><span style="flex:1">AI Advisor</span><span style="font-size:.55rem;background:var(--cyan);color:#020810;padding:2px 5px;border-radius:99px;font-weight:700">AI</span></button>
+      <button class="nav-item" id="nav-jd" onclick="showPage('jd')"><span style="font-size:13px;width:16px;text-align:center">⊙</span><span style="flex:1">JD Parser</span></button>
+      <button class="nav-item" id="nav-internships" onclick="showPage('internships')"><span style="font-size:13px;width:16px;text-align:center">◉</span><span style="flex:1">Internships</span></button>
+      <button class="nav-item" id="nav-projects" onclick="showPage('projects')"><span style="font-size:13px;width:16px;text-align:center">⬡</span><span style="flex:1">Projects</span></button>
+      <button class="nav-item" id="nav-interview" onclick="showPage('interview')"><span style="font-size:13px;width:16px;text-align:center">◐</span><span style="flex:1">Interview</span></button>
+      <button class="nav-item" id="nav-verify" onclick="showPage('verify')"><span style="font-size:13px;width:16px;text-align:center">◎</span><span style="flex:1">Verify Skills</span></button>
+    </nav>
+    <!-- Theme + Logout -->
+    <div style="padding:8px;border-top:1px solid var(--border);flex-shrink:0">
+      <!-- Theme toggle -->
+      <button id="theme-toggle-btn" onclick="toggleTheme()" class="nav-item" style="width:100%;border-radius:9px;margin-bottom:6px;background:var(--bg3);border:1px solid var(--border)">
+        <span id="theme-icon" style="font-size:14px">☀️</span>
+        <span id="theme-label" style="flex:1">Light Mode</span>
+        <div id="theme-track" style="width:36px;height:20px;border-radius:99px;position:relative;background:var(--bg4);border:1px solid var(--b2);flex-shrink:0;transition:background .2s">
+          <div id="theme-thumb" style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--t3);transition:left .2s,background .2s"></div>
+        </div>
+      </button>
+      <button class="nav-item" onclick="doLogout()" style="width:100%;border-radius:9px" onmouseenter="this.style.color='var(--red)';this.style.background='var(--rdim)'" onmouseleave="this.style.color='';this.style.background=''">
+        <span style="font-size:13px">⊗</span> Sign Out
+      </button>
+      <div style="font-size:.6rem;color:var(--t3);font-family:'DM Mono',monospace;padding:5px 10px;opacity:.5">SkillPath AI v2.0</div>
+    </div>
+  </aside>
+
+  <!-- ── MOBILE TOPBAR ── -->
+  <div class="mobile-topbar">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#38bdf8,#4ade80);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#020810">S</div>
+      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem">SkillPath AI</span>
+    </div>
+    <button onclick="toggleSidebar()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:1rem">☰</button>
+  </div>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="main">
+    <div class="page" style="position:relative;z-index:1">
+
+      <!-- ─────────────────── DASHBOARD ─────────────────── -->
+      <div id="page-dashboard" class="fade-up">
+        <div style="margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+          <div>
+            <h1 id="dash-greeting" style="margin-bottom:4px">Good morning, <span style="color:var(--cyan)" id="dash-name-span">there</span> ◐</h1>
+            <p id="dash-role-line" style="margin:0">Targeting <span style="color:var(--text)">Backend Developer</span> <span style="margin-left:8px;color:var(--green);font-size:.85rem">· Top 28% of aspirants</span></p>
+          </div>
+          <button class="btn-ghost" onclick="showPage('chat')" style="display:flex;align-items:center;gap:8px"><span class="dot-live"></span> AI Advisor</button>
+        </div>
+
+        <!-- Next Best Action -->
+        <div style="background:linear-gradient(135deg,var(--cdim),rgba(74,222,128,.05));border:1px solid var(--b2);border-radius:14px;padding:16px 20px;margin-bottom:24px" class="fade-up">
+          <div style="font-size:.7rem;color:var(--cyan);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">◆ Next Best Action</div>
+          <div id="dash-nba" style="font-size:1rem;font-weight:600;margin-bottom:4px">Learn <span style="color:var(--cyan)">Docker</span> — your most critical gap for Backend Developer</div>
+          <div style="font-size:.83rem;color:var(--t2);margin-bottom:12px">Currently at 15% · Need 75% · Gap: 60%</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-primary" onclick="showPage('roadmap')" style="font-size:.83rem;padding:7px 16px">View Roadmap →</button>
+            <button class="btn-ghost" onclick="showPage('gap')" style="font-size:.83rem">Full Gap Analysis</button>
+          </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div id="dash-stat-cards" class="grid4" style="margin-bottom:24px">
+          <div class="card" style="text-align:center;padding:16px 10px"><div style="font-size:1.3rem;margin-bottom:6px">◈</div><div style="font-size:1.7rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--cyan);line-height:1">62%</div><div style="font-size:.62rem;color:var(--t3);margin-top:5px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Role Readiness</div></div>
+          <div class="card" style="text-align:center;padding:16px 10px"><div style="font-size:1.3rem;margin-bottom:6px">◉</div><div style="font-size:1.7rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--green);line-height:1">58%</div><div style="font-size:.62rem;color:var(--t3);margin-top:5px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Placement Score</div></div>
+          <div class="card" style="text-align:center;padding:16px 10px"><div style="font-size:1.3rem;margin-bottom:6px">◎</div><div style="font-size:1.7rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--purple);line-height:1">3</div><div style="font-size:.62rem;color:var(--t3);margin-top:5px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Verified Skills</div></div>
+          <div class="card" style="text-align:center;padding:16px 10px"><div style="font-size:1.3rem;margin-bottom:6px">⬡</div><div style="font-size:1.7rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--amber);line-height:1">12</div><div style="font-size:.62rem;color:var(--t3);margin-top:5px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Skills Tracked</div></div>
+        </div>
+
+        <!-- Score rings + History -->
+        <div class="grid2" style="margin-bottom:24px;align-items:start">
+          <div class="card">
+            <div style="font-size:.75rem;color:var(--t3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Score Breakdown</div>
+            <div style="display:flex;justify-content:space-around;flex-wrap:wrap;gap:16px">
+              <div style="text-align:center"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="var(--bg4)" stroke-width="5"/><circle cx="42" cy="42" r="34" fill="none" stroke="var(--cyan)" stroke-width="5" stroke-dasharray="133 213" stroke-linecap="round" transform="rotate(-90 42 42)"/><text x="42" y="38" text-anchor="middle" fill="var(--cyan)" font-size="15" font-weight="700" font-family="Syne,sans-serif">62%</text><text x="42" y="55" text-anchor="middle" fill="var(--t3)" font-size="8" font-family="DM Mono,monospace">Readiness</text></svg></div>
+              <div style="text-align:center"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="var(--bg4)" stroke-width="5"/><circle cx="42" cy="42" r="34" fill="none" stroke="var(--green)" stroke-width="5" stroke-dasharray="124 213" stroke-linecap="round" transform="rotate(-90 42 42)"/><text x="42" y="38" text-anchor="middle" fill="var(--green)" font-size="15" font-weight="700" font-family="Syne,sans-serif">58%</text><text x="42" y="55" text-anchor="middle" fill="var(--t3)" font-size="8" font-family="DM Mono,monospace">Placement</text></svg></div>
+              <div style="text-align:center"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="var(--bg4)" stroke-width="5"/><circle cx="42" cy="42" r="34" fill="none" stroke="var(--amber)" stroke-width="5" stroke-dasharray="149 213" stroke-linecap="round" transform="rotate(-90 42 42)"/><text x="42" y="38" text-anchor="middle" fill="var(--amber)" font-size="15" font-weight="700" font-family="Syne,sans-serif">70%</text><text x="42" y="55" text-anchor="middle" fill="var(--t3)" font-size="8" font-family="DM Mono,monospace">Resume</text></svg></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:.75rem;color:var(--t3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Progress History</div>
+            <div style="display:flex;align-items:flex-end;gap:5px;height:80px">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;border-radius:4px 4px 0 0;background:var(--bg4);height:25px"></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;border-radius:4px 4px 0 0;background:var(--bg4);height:30px"></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;border-radius:4px 4px 0 0;background:var(--bg4);height:38px"></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;border-radius:4px 4px 0 0;background:var(--bg4);height:44px"></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;border-radius:4px 4px 0 0;background:var(--bg4);height:52px"></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="width:100%;border-radius:4px 4px 0 0;background:var(--cyan);height:62px"></div></div>
+            </div>
+            <button class="btn-ghost" onclick="toast('Snapshot saved!','success')" style="margin-top:10px;font-size:.78rem;padding:5px 12px">Save Snapshot</button>
+          </div>
+        </div>
+
+        <!-- Top Skill Gaps -->
+        <div class="card" style="margin-bottom:24px">
+          <div class="section-header"><div><h2 style="margin-bottom:3px">Top Skill Gaps</h2><p style="margin:0;font-size:.82rem">For Backend Developer</p></div><button class="btn-ghost" onclick="showPage('gap')" style="font-size:.8rem">Full analysis →</button></div>
+          <div id="dash-skill-bars"></div>
+        </div>
+
+        <!-- Quick actions -->
+        <div><div class="section-header"><h2>Quick Actions</h2></div>
+        <div class="grid4">
+          <div class="card" onclick="showPage('profile')" style="cursor:pointer;padding:16px;text-align:center"><div style="font-size:26px;margin-bottom:8px">📄</div><div style="font-size:.88rem;font-weight:600;margin-bottom:3px">Analyze Resume</div><div style="font-size:.75rem;color:var(--cyan);font-family:'DM Mono',monospace">Upload PDF</div></div>
+          <div class="card" onclick="showPage('jd')" style="cursor:pointer;padding:16px;text-align:center"><div style="font-size:26px;margin-bottom:8px">🔍</div><div style="font-size:.88rem;font-weight:600;margin-bottom:3px">Parse Job Description</div><div style="font-size:.75rem;color:var(--purple);font-family:'DM Mono',monospace">Any JD URL</div></div>
+          <div class="card" onclick="showPage('internships')" style="cursor:pointer;padding:16px;text-align:center"><div style="font-size:26px;margin-bottom:8px">🏢</div><div style="font-size:.88rem;font-weight:600;margin-bottom:3px">Internships</div><div style="font-size:.75rem;color:var(--amber);font-family:'DM Mono',monospace">62% match</div></div>
+          <div class="card" onclick="showPage('interview')" style="cursor:pointer;padding:16px;text-align:center"><div style="font-size:26px;margin-bottom:8px">🤖</div><div style="font-size:.88rem;font-weight:600;margin-bottom:3px">Interview Sim</div><div style="font-size:.75rem;color:var(--green);font-family:'DM Mono',monospace">AI Interviewer</div></div>
+        </div></div>
+      </div>
+
+      <!-- ─────────────────── PROFILE ─────────────────── -->
+      <div id="page-profile" class="fade-up page-hidden">
+        <div class="section-header"><div><h2>Profile</h2><p style="margin:0;font-size:.82rem">Manage your career profile and uploaded data</p></div></div>
+        <div id="profile-alert" style="display:none;margin-bottom:16px;padding:11px 16px;border-radius:10px;font-size:.85rem"></div>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div class="card">
+            <div style="font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Basic Info</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+              <div><label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Full Name</label><input value="" id="p-name" placeholder="Your full name"/></div>
+              <div><label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Target Role</label><select id="p-role"><option value="">Select a role...</option><option value="Backend Developer">Backend Developer</option><option>Full Stack Developer</option><option>Data Scientist</option><option>DevOps Engineer</option><option>AI Engineer</option><option>Frontend Developer</option></select></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Academic Record</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px">
+              <div><label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">College</label><input value="" id="p-college" placeholder="Your college"/></div>
+              <div><label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Degree</label><input value="" id="p-degree" placeholder="B.Tech CSE"/></div>
+              <div><label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">CGPA</label><input value="" id="p-cgpa" placeholder="e.g. 8.5"/></div>
+              <div><label style="font-size:.68rem;color:var(--t3);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;font-family:'DM Mono',monospace">Grad Year</label><input value="" id="p-year" placeholder="e.g. 2025"/></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Resume Analyzer</div>
+            <div id="resume-drop" style="border:2px dashed var(--b2);border-radius:12px;padding:26px 20px;text-align:center;background:var(--bg3);transition:all .2s" ondragover="event.preventDefault();this.style.borderColor='var(--cyan)';this.style.background='var(--cdim)'" ondragleave="this.style.borderColor='var(--b2)';this.style.background='var(--bg3)'" ondrop="simulateUpload(event)">
+              <div style="font-size:32px;margin-bottom:8px">📄</div>
+              <div style="font-size:.9rem;font-weight:600;margin-bottom:4px">Drop your PDF resume here</div>
+              <div style="font-size:.75rem;color:var(--t3);margin-bottom:16px">PDF only · Max 5 MB · AI extracts your skills automatically</div>
+              <label style="display:inline-flex;align-items:center;gap:8px;background:var(--cyan);color:#020810;font-weight:700;font-size:.83rem;padding:10px 22px;border-radius:9px;cursor:pointer">
+                📂 Browse & Upload PDF
+                <input type="file" accept=".pdf" style="display:none" onchange="simulateUpload(event)"/>
+              </label>
+              <div style="margin-top:10px"><span class="badge" style="background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.28)">✓ Resume on file — upload again to update</span></div>
+            </div>
+            <div id="resume-result" style="display:none;margin-top:10px;padding:12px 14px;background:var(--gdim);border:1px solid rgba(74,222,128,.25);border-radius:10px">
+              <div style="font-size:.65rem;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Skills extracted from your resume</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px" id="extracted-skills"></div>
+            </div>
+            <div style="margin-top:12px;padding:9px 13px;background:var(--bg3);border-radius:8px;font-size:.75rem;color:var(--t3);border-left:2px solid var(--b2)">Requires backend at <code style="color:var(--cyan)">localhost:8000</code> in production — this preview simulates upload.</div>
+          </div>
+          <div class="card">
+            <div style="font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">GitHub Analyzer</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <input value="" id="p-github" style="flex:1;min-width:200px" placeholder="https://github.com/your-username"/>
+              <button class="btn-primary" onclick="simulateGitHub()" style="flex-shrink:0;display:flex;align-items:center;gap:8px">Scan Repos →</button>
+            </div>
+            <div id="github-result" style="display:none;margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+              <span class="badge" style="background:var(--cdim);color:var(--cyan);border:1px solid var(--b2)">24 repos</span>
+              <span class="badge" style="background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.28)">Score: 72%</span>
+              <span class="badge" style="background:rgba(255,255,255,.05);color:var(--t2);border:1px solid rgba(255,255,255,.12)">Python</span>
+              <span class="badge" style="background:rgba(255,255,255,.05);color:var(--t2);border:1px solid rgba(255,255,255,.12)">JavaScript</span>
+              <span class="badge" style="background:rgba(255,255,255,.05);color:var(--t2);border:1px solid rgba(255,255,255,.12)">FastAPI</span>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Skills on Profile <span id="profile-skills-count">(0)</span></div>
+            <div id="profile-skills-display" style="display:flex;flex-wrap:wrap;gap:7px"><p style="margin:0;font-size:.82rem;color:var(--t3)">No skills yet. Upload your resume or scan GitHub to auto-extract them.</p></div>
+          </div>
+          <button class="btn-primary" onclick="toast('Profile saved successfully!','success')" style="align-self:flex-start;display:flex;align-items:center;gap:8px">Save Profile →</button>
+        </div>
+      </div>
+
+      <!-- ─────────────────── SKILL GAP ─────────────────── -->
+      <div id="page-gap" class="fade-up page-hidden">
+        <div class="section-header">
+          <div><h2>Skill Gap Analyzer</h2><p id="gap-role-text" style="margin:0;font-size:.82rem">Target: Backend Developer</p></div>
+          <span class="badge" style="background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.28)">Top 28%</span>
+        </div>
+        <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+          <div class="card" style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:20px">
+            <svg width="100" height="100" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="var(--bg4)" stroke-width="5"/><circle cx="42" cy="42" r="34" fill="none" stroke="var(--cyan)" stroke-width="5" stroke-dasharray="133 213" stroke-linecap="round" transform="rotate(-90 42 42)"/><text x="42" y="38" text-anchor="middle" fill="var(--cyan)" font-size="15" font-weight="700" font-family="Syne,sans-serif">62%</text><text x="42" y="55" text-anchor="middle" fill="var(--t3)" font-size="8" font-family="DM Mono,monospace">Readiness</text></svg>
+          </div>
+          <div class="card" style="flex:1;min-width:200px"><div id="gap-mini-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="text-align:center;padding:10px 8px;background:var(--bg3);border-radius:8px"><div style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--red)">3</div><div style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:2px">Critical Gaps</div></div>
+            <div style="text-align:center;padding:10px 8px;background:var(--bg3);border-radius:8px"><div style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--amber)">4</div><div style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:2px">Important Gaps</div></div>
+            <div style="text-align:center;padding:10px 8px;background:var(--bg3);border-radius:8px"><div style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--green)">5</div><div style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:2px">Skills Met</div></div>
+            <div style="text-align:center;padding:10px 8px;background:var(--bg3);border-radius:8px"><div style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--cyan)">12</div><div style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:2px">Total Skills</div></div>
+          </div></div>
+        </div>
+        <div class="tab-nav" id="gap-tabs">
+          <button class="tab-item active" onclick="switchGapTab('all',this)">All Skills</button>
+          <button class="tab-item" onclick="switchGapTab('critical',this)">Critical (3)</button>
+          <button class="tab-item" onclick="switchGapTab('important',this)">Important (4)</button>
+          <button class="tab-item" onclick="switchGapTab('met',this)">Met (5)</button>
+        </div>
+        <div class="card" style="margin-top:16px" id="gap-content"></div>
+      </div>
+
+      <!-- ─────────────────── ROADMAP ─────────────────── -->
+      <div id="page-roadmap" class="fade-up page-hidden">
+        <div class="section-header">
+          <div><h2>Learning Roadmap</h2><p id="roadmap-role-text" style="margin:0;font-size:.82rem">Goal: Backend Developer</p></div>
+          <button class="btn-ghost" onclick="toast('Roadmap regenerated!','info')" style="font-size:.8rem">Regenerate</button>
+        </div>
+        <div class="card" style="margin-bottom:20px;padding:14px 18px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:.83rem;color:var(--t3)">
+            <span>Overall Progress</span><span style="color:var(--cyan);font-family:'DM Mono',monospace" id="roadmap-progress-label">2/8 weeks</span>
+          </div>
+          <div class="progress-track" style="height:8px"><div class="progress-fill" style="width:25%;background:var(--cyan)" id="roadmap-progress-bar"></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px" id="roadmap-steps"></div>
+      </div>
+
+      <!-- ─────────────────── CHAT ─────────────────── -->
+      <div id="page-chat" class="fade-up page-hidden" style="display:flex;flex-direction:column;height:calc(100vh - 80px)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+          <div><h2 style="margin-bottom:2px">AI Career Advisor</h2><p style="margin:0;font-size:.83rem">Context-aware advice based on your real profile data</p></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--green)"><span class="dot-live"></span> Live · Profile loaded</div>
+        </div>
+        <div id="chat-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:4px 0;margin-bottom:12px"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;flex-shrink:0" id="quick-prompts"></div>
+        <div style="display:flex;gap:10px;flex-shrink:0">
+          <input id="chat-input" placeholder="Ask anything about your career path..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
+          <button class="btn-primary" onclick="sendChat()" style="padding:10px 18px;flex-shrink:0">Send →</button>
+        </div>
+      </div>
+
+      <!-- ─────────────────── JD PARSER ─────────────────── -->
+      <div id="page-jd" class="fade-up page-hidden">
+        <div class="section-header"><div><h2>Job Description Parser</h2><p style="margin:0;font-size:.82rem">Paste any JD — get instant personalized skill match analysis</p></div></div>
+        <div class="tab-nav" style="margin-bottom:20px">
+          <button class="tab-item active" onclick="switchJDTab('parse',this)">parse</button>
+          <button class="tab-item" onclick="switchJDTab('history',this)">history (3)</button>
+        </div>
+        <div id="jd-parse-tab">
+          <div class="card" style="margin-bottom:16px">
+            <label style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace;display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Paste Job Description</label>
+            <textarea id="jd-input" rows="9" placeholder="We are looking for a Backend Developer with experience in Node.js, Docker, MongoDB...&#10;&#10;Paste the full job description here and we'll instantly show how well your skills match."></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:8px">
+              <span style="font-size:.75rem;color:var(--t3);font-family:'DM Mono',monospace" id="jd-char-count">0 / 5000 chars</span>
+              <button class="btn-primary" onclick="analyzeJD()" style="display:flex;align-items:center;gap:8px">Analyze JD →</button>
+            </div>
+          </div>
+          <div id="jd-result" style="display:none"></div>
+        </div>
+        <div id="jd-history-tab" style="display:none"></div>
+      </div>
+
+      <!-- ─────────────────── INTERNSHIPS ─────────────────── -->
+      <div id="page-internships" class="fade-up page-hidden">
+        <div class="section-header"><div><h2>Internship Recommendations</h2><p style="margin:0;font-size:.82rem">Ranked by your current skill match percentage</p></div></div>
+        <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap" id="intern-filter-btns"></div>
+        <div style="display:flex;flex-direction:column;gap:14px" id="internships-list"></div>
+      </div>
+
+      <!-- ─────────────────── PROJECTS ─────────────────── -->
+      <div id="page-projects" class="fade-up page-hidden">
+        <div class="section-header"><div><h2>Projects & Certifications</h2><p style="margin:0;font-size:.82rem">Tailored to fill your specific skill gaps</p></div></div>
+        <div class="tab-nav" style="margin-bottom:20px">
+          <button class="tab-item active" onclick="switchProjectTab('projects',this)">Projects</button>
+          <button class="tab-item" onclick="switchProjectTab('certs',this)">Certifications</button>
+          <button class="tab-item" onclick="switchProjectTab('generator',this)">Description Generator</button>
+        </div>
+        <div id="projects-content"></div>
+        <div id="certs-content" style="display:none"></div>
+        <div id="generator-content" style="display:none">
+          <div class="card" style="border-color:var(--pdim)">
+            <div style="font-size:.75rem;color:var(--purple);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">AI Resume Description Generator</div>
+            <p style="margin-bottom:14px;font-size:.88rem">Type what you built in plain language — AI turns it into a professional resume bullet point.</p>
+            <textarea id="gen-input" rows="4" placeholder="e.g. Movie recommendation system using Python and collaborative filtering..." style="margin-bottom:12px"></textarea>
+            <button class="btn-primary" onclick="generateDesc()" style="display:flex;align-items:center;gap:8px">Generate Bullet Point →</button>
+            <div id="gen-result" style="display:none;margin-top:16px;padding:14px;background:var(--bg3);border-radius:10px;border-left:3px solid var(--purple)">
+              <div style="font-size:.7rem;color:var(--purple);font-family:'DM Mono',monospace;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Generated Bullet Point</div>
+              <p id="gen-output" style="margin:0;color:var(--text);line-height:1.7;font-size:.9rem"></p>
+              <button onclick="navigator.clipboard.writeText(document.getElementById('gen-output').textContent);toast('Copied!','success')" style="margin-top:10px;background:transparent;color:var(--purple);font-size:.75rem;padding:3px 10px;border-radius:6px;border:1px solid rgba(167,139,250,.3)">Copy →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────────────── INTERVIEW ─────────────────── -->
+      <div id="page-interview" class="fade-up page-hidden">
+        <div class="section-header"><div><h2>Interview Simulation</h2><p style="margin:0;font-size:.82rem">AI evaluates your answers like a real interviewer</p></div></div>
+        <div id="interview-setup">
+          <div class="card" style="max-width:480px;text-align:center;padding:36px 28px;margin:0 auto">
+            <div style="font-size:48px;margin-bottom:16px">🤖</div>
+            <h3 style="margin-bottom:8px">Ready to interview?</h3>
+            <p style="margin-bottom:20px">5 questions for your target role. Answer naturally — AI evaluates concepts, not word-for-word matching.</p>
+            <div style="margin-bottom:20px">
+              <label style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Select Role</label>
+              <select id="interview-role"><option>Backend Developer</option><option>Full Stack Developer</option><option>Data Scientist</option><option>DevOps Engineer</option><option>AI Engineer</option></select>
+            </div>
+            <button class="btn-primary" onclick="startInterview()" style="display:inline-flex;align-items:center;gap:8px">Start Interview →</button>
+          </div>
+        </div>
+        <div id="interview-question" style="display:none;max-width:680px"></div>
+        <div id="interview-done" style="display:none"></div>
+      </div>
+
+      <!-- ─────────────────── VERIFY ─────────────────── -->
+      <div id="page-verify" class="fade-up page-hidden">
+        <div class="section-header">
+          <div><h2>Skill Verification</h2><p style="margin:0;font-size:.82rem">Take a 5-question quiz to earn a verified badge</p></div>
+          <span class="badge" style="background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.28)">3 verified</span>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div style="font-size:.72rem;color:var(--green);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Verified Skills</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="badge" style="background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.28)">✓ Python</span>
+            <span class="badge" style="background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.28)">✓ JavaScript</span>
+            <span class="badge" style="background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.28)">✓ React</span>
+          </div>
+        </div>
+        <div id="verify-select">
+          <div class="card" style="margin-bottom:16px">
+            <div style="font-size:.75rem;color:var(--t3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Quick Select</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px" id="verify-skill-buttons"></div>
+          </div>
+          <div class="card">
+            <div style="font-size:.75rem;color:var(--t3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Or type any skill</div>
+            <div style="display:flex;gap:10px">
+              <input id="custom-skill" placeholder="e.g. Kubernetes, Redis, TypeScript..." onkeydown="if(event.key==='Enter')startVerify(document.getElementById('custom-skill').value)"/>
+              <button class="btn-primary" onclick="startVerify(document.getElementById('custom-skill').value)" style="flex-shrink:0">Start Quiz →</button>
+            </div>
+          </div>
+        </div>
+        <div id="verify-quiz" style="display:none;max-width:640px"></div>
+        <div id="verify-result" style="display:none"></div>
+      </div>
+
+    </div><!-- /page -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  CURRENT USER STATE  (populated on login/signup)
+// ══════════════════════════════════════════════════════════
+let CURRENT_USER = {
+  name: '',
+  firstName: '',
+  role: '',
+  email: '',
+  skills: [],
+  goal: '',
+  college: '',
+  degree: '',
+  cgpa: '',
+  year: '',
+  github: '',
+  linkedin: '',
+  readiness: 0,
+  isDemo: false,
+};
+
+// Role-specific skill gap data
+const ROLE_SKILL_GAPS = {
+  'Backend Developer': [
+    {skill:'Docker',        your:15, req:75, gap:60, importance:'critical',  cat:'DevOps'},
+    {skill:'Kubernetes',    your:5,  req:60, gap:55, importance:'critical',  cat:'DevOps'},
+    {skill:'System Design', your:30, req:85, gap:55, importance:'critical',  cat:'Architecture'},
+    {skill:'Redis',         your:20, req:60, gap:40, importance:'important', cat:'Database'},
+    {skill:'AWS / Cloud',   your:10, req:50, gap:40, importance:'important', cat:'Cloud'},
+    {skill:'CI/CD',         your:25, req:60, gap:35, importance:'important', cat:'DevOps'},
+    {skill:'PostgreSQL',    your:40, req:70, gap:30, importance:'important', cat:'Database'},
+    {skill:'Python',        your:80, req:80, gap:0,  importance:'critical',  cat:'Language',  met:true},
+    {skill:'Node.js',       your:70, req:70, gap:0,  importance:'important', cat:'Backend',   met:true},
+    {skill:'REST APIs',     your:75, req:70, gap:0,  importance:'important', cat:'Backend',   met:true},
+    {skill:'MongoDB',       your:65, req:60, gap:0,  importance:'important', cat:'Database',  met:true},
+    {skill:'Git',           your:85, req:70, gap:0,  importance:'basic',     cat:'Tools',     met:true},
+  ],
+  'Full Stack Developer': [
+    {skill:'React',         your:15, req:80, gap:65, importance:'critical',  cat:'Frontend'},
+    {skill:'TypeScript',    your:10, req:65, gap:55, importance:'critical',  cat:'Language'},
+    {skill:'Docker',        your:10, req:55, gap:45, importance:'important', cat:'DevOps'},
+    {skill:'AWS',           your:5,  req:45, gap:40, importance:'important', cat:'Cloud'},
+    {skill:'GraphQL',       your:0,  req:40, gap:40, importance:'important', cat:'API'},
+    {skill:'Node.js',       your:50, req:75, gap:0,  importance:'critical',  cat:'Backend',   met:true},
+    {skill:'MongoDB',       your:55, req:50, gap:0,  importance:'important', cat:'Database',  met:true},
+    {skill:'Git',           your:70, req:65, gap:0,  importance:'basic',     cat:'Tools',     met:true},
+  ],
+  'Data Scientist': [
+    {skill:'Machine Learning', your:10, req:80, gap:70, importance:'critical',  cat:'AI/ML'},
+    {skill:'Deep Learning',    your:5,  req:65, gap:60, importance:'critical',  cat:'AI/ML'},
+    {skill:'Statistics',       your:30, req:80, gap:50, importance:'critical',  cat:'Math'},
+    {skill:'TensorFlow',       your:5,  req:55, gap:50, importance:'important', cat:'Framework'},
+    {skill:'Data Viz',         your:20, req:60, gap:40, importance:'important', cat:'Analytics'},
+    {skill:'Python',           your:70, req:90, gap:20, importance:'critical',  cat:'Language'},
+    {skill:'SQL',              your:60, req:70, gap:10, importance:'important', cat:'Database'},
+    {skill:'Pandas',           your:55, req:70, gap:0,  importance:'important', cat:'Library',   met:true},
+  ],
+  'DevOps Engineer': [
+    {skill:'Kubernetes',  your:5,  req:85, gap:80, importance:'critical',  cat:'Orchestration'},
+    {skill:'Terraform',   your:0,  req:70, gap:70, importance:'critical',  cat:'IaC'},
+    {skill:'AWS / Cloud', your:10, req:80, gap:70, importance:'critical',  cat:'Cloud'},
+    {skill:'CI/CD',       your:20, req:75, gap:55, importance:'critical',  cat:'Automation'},
+    {skill:'Monitoring',  your:15, req:60, gap:45, importance:'important', cat:'Ops'},
+    {skill:'Docker',      your:40, req:80, gap:40, importance:'critical',  cat:'Containers'},
+    {skill:'Linux',       your:55, req:80, gap:25, importance:'critical',  cat:'OS'},
+    {skill:'Git',         your:70, req:70, gap:0,  importance:'basic',     cat:'Tools',     met:true},
+  ],
+  'AI Engineer': [
+    {skill:'LLM APIs',        your:5,  req:80, gap:75, importance:'critical',  cat:'AI'},
+    {skill:'Deep Learning',   your:10, req:75, gap:65, importance:'critical',  cat:'AI/ML'},
+    {skill:'PyTorch',         your:5,  req:70, gap:65, importance:'critical',  cat:'Framework'},
+    {skill:'MLOps / Docker',  your:10, req:60, gap:50, importance:'important', cat:'DevOps'},
+    {skill:'Vector DBs',      your:0,  req:55, gap:55, importance:'important', cat:'Database'},
+    {skill:'Python',          your:65, req:90, gap:25, importance:'critical',  cat:'Language'},
+    {skill:'Statistics',      your:40, req:65, gap:25, importance:'important', cat:'Math'},
+  ],
+  'Frontend Developer': [
+    {skill:'React',        your:15, req:85, gap:70, importance:'critical',  cat:'Framework'},
+    {skill:'TypeScript',   your:10, req:75, gap:65, importance:'critical',  cat:'Language'},
+    {skill:'CSS / Tailwind',your:30,req:80, gap:50, importance:'critical',  cat:'Styling'},
+    {skill:'Testing',      your:10, req:60, gap:50, importance:'important', cat:'QA'},
+    {skill:'Performance',  your:15, req:55, gap:40, importance:'important', cat:'Optimization'},
+    {skill:'JavaScript',   your:60, req:85, gap:25, importance:'critical',  cat:'Language'},
+    {skill:'Git',          your:65, req:65, gap:0,  importance:'basic',     cat:'Tools',     met:true},
+  ],
+};
+
+function getSkillGaps() {
+  return ROLE_SKILL_GAPS[CURRENT_USER.role] || ROLE_SKILL_GAPS['Backend Developer'];
+}
+
+// ══════════════════════════════════════════════════════════
+//  UPDATE ALL UI WITH CURRENT USER DATA
+// ══════════════════════════════════════════════════════════
+function updateUIForUser() {
+  const u = CURRENT_USER;
+  const gaps = getSkillGaps();
+  const criticalGaps = gaps.filter(g => g.gap > 0);
+  const topGap = criticalGaps[0];
+  const displayName = u.name || u.firstName || 'there';
+  const firstN = u.firstName || (u.name ? u.name.split(' ')[0] : 'there');
+
+  // ── Sidebar ──
+  const av = document.getElementById('sb-avatar');
+  if (av) av.textContent = firstN.charAt(0).toUpperCase() || '?';
+
+  const sn = document.getElementById('sb-name');
+  if (sn) sn.textContent = displayName;
+
+  const sr = document.getElementById('sb-ready');
+  if (sr) sr.textContent = (u.readiness || 0) + '% ready';
+
+  const sp = document.getElementById('sb-progress');
+  if (sp) sp.style.width = (u.readiness || 0) + '%';
+
+  // ── Dashboard greeting ──
+  const dg = document.getElementById('dash-greeting');
+  if (dg) dg.innerHTML = `Good morning, <span style="color:var(--cyan)">${firstN}</span> ◐`;
+
+  const dr = document.getElementById('dash-role-line');
+  const roleText = u.role || 'your target role';
+  const roleNote = u.role ? '· Start building your profile' : '· Set your target role to begin';
+  if (dr) dr.innerHTML = `Targeting <span style="color:var(--text)">${roleText}</span> <span style="margin-left:8px;color:var(--green);font-size:.85rem">${roleNote}</span>`;
+
+  // ── Dashboard NBA ──
+  const nba = document.getElementById('dash-nba');
+  if (nba && topGap) {
+    nba.innerHTML = `Learn <span style="color:var(--cyan)">${topGap.skill}</span> — your most critical gap for ${u.role}`;
+  } else if (nba) {
+    nba.innerHTML = `Set your target role and add skills to see personalized recommendations`;
+  }
+
+  // ── Dashboard stat cards ──
+  const sc = document.getElementById('dash-stat-cards');
+  if (sc) {
+    sc.innerHTML = `
+      <div class="card" style="text-align:center;padding:16px 10px">
+        <div style="font-size:1.3rem;margin-bottom:6px">◈</div>
+        <div style="font-size:1.7rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--cyan);line-height:1">${u.readiness}%</div>
+        <div style="font-size:.62rem;color:var(--t3);margin-top:5px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Role Readiness</div>
+      </div>
+      <div class="card" style="text-align:center;padding:16px 10px">
+        <div style="font-size:1.3rem;margin-bottom:6px">◉</div>
+        <div style="font-size:1.7rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--green);line-height:1">${Math.round(u.readiness * 0.9)}%</div>
+        <div style="font-size:.62rem;color:var(--t3);margin-top:5px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Placement Score</div>
+      </div>
+      <div class="card" style="text-align:center;padding:16px 10px">
+        <div style="font-size:1.3rem;margin-bottom:6px">◎</div>
+        <div style="font-size:1.7rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--purple);line-height:1">0</div>
+        <div style="font-size:.62rem;color:var(--t3);margin-top:5px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Verified Skills</div>
+      </div>
+      <div class="card" style="text-align:center;padding:16px 10px">
+        <div style="font-size:1.3rem;margin-bottom:6px">⬡</div>
+        <div style="font-size:1.7rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--amber);line-height:1">${u.skills.length}</div>
+        <div style="font-size:.62rem;color:var(--t3);margin-top:5px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Skills Tracked</div>
+      </div>`;
+  }
+
+  // ── Gap analyzer ──
+  const grt = document.getElementById('gap-role-text');
+  if (grt) grt.textContent = 'Target: ' + u.role;
+
+  // ── Roadmap ──
+  const rrt = document.getElementById('roadmap-role-text');
+  if (rrt) rrt.textContent = 'Goal: ' + u.role;
+
+  // ── Profile page inputs ──
+  const pn = document.getElementById('p-name');
+  if (pn) pn.value = u.name;
+
+  const pr = document.getElementById('p-role');
+  if (pr) {
+    for (let i = 0; i < pr.options.length; i++) {
+      if (pr.options[i].value === u.role || pr.options[i].text === u.role) {
+        pr.selectedIndex = i; break;
+      }
+    }
+  }
+
+  const pc = document.getElementById('p-college');
+  if (pc) pc.value = u.college || '';
+
+  const pd = document.getElementById('p-degree');
+  if (pd) pd.value = u.degree || '';
+
+  const pg = document.getElementById('p-cgpa');
+  if (pg) pg.value = u.cgpa || '';
+
+  const py = document.getElementById('p-year');
+  if (py) py.value = u.year || '';
+
+  const pgh = document.getElementById('p-github');
+  if (pgh) pgh.value = u.github || '';
+
+  // Skills on profile
+  const skillsCard = document.getElementById('profile-skills-display');
+  if (skillsCard) {
+    if (u.skills && u.skills.length > 0) {
+      skillsCard.innerHTML = u.skills.map(s =>
+        `<span class="badge" style="background:rgba(255,255,255,.05);color:var(--t2);border:1px solid rgba(255,255,255,.12)">${s}</span>`
+      ).join('');
+      const countEl = document.getElementById('profile-skills-count');
+      if (countEl) countEl.textContent = '(' + u.skills.length + ')';
+    } else {
+      skillsCard.innerHTML = '<p style="margin:0;font-size:.82rem;color:var(--t3)">No skills yet. Upload your resume or scan GitHub to auto-extract them.</p>';
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  MOCK DATA
+// ══════════════════════════════════════════════════════════
+const SKILL_GAPS = [
+  {skill:'Docker',        your:15, req:75, gap:60, importance:'critical',  cat:'DevOps'},
+  {skill:'Kubernetes',    your:5,  req:60, gap:55, importance:'critical',  cat:'DevOps'},
+  {skill:'System Design', your:30, req:85, gap:55, importance:'critical',  cat:'Architecture'},
+  {skill:'Redis',         your:20, req:60, gap:40, importance:'important', cat:'Database'},
+  {skill:'AWS / Cloud',   your:10, req:50, gap:40, importance:'important', cat:'Cloud'},
+  {skill:'CI/CD',         your:25, req:60, gap:35, importance:'important', cat:'DevOps'},
+  {skill:'PostgreSQL',    your:40, req:70, gap:30, importance:'important', cat:'Database'},
+  {skill:'Python',        your:80, req:80, gap:0,  importance:'critical',  cat:'Language',  met:true},
+  {skill:'Node.js',       your:70, req:70, gap:0,  importance:'important', cat:'Backend',   met:true},
+  {skill:'REST APIs',     your:75, req:70, gap:0,  importance:'important', cat:'Backend',   met:true},
+  {skill:'MongoDB',       your:65, req:60, gap:0,  importance:'important', cat:'Database',  met:true},
+  {skill:'Git',           your:85, req:70, gap:0,  importance:'basic',     cat:'Tools',     met:true},
+];
+
+const ROADMAP = [
+  {week:1,skill:'Docker Fundamentals',resource:'Docker Official Docs',hours:8,url:'https://docs.docker.com',done:true},
+  {week:2,skill:'Docker Compose & Networking',resource:'Docker Mastery (Udemy)',hours:10,url:'https://udemy.com',done:true},
+  {week:3,skill:'Kubernetes Basics',resource:'K8s Official Tutorial',hours:12,url:'https://kubernetes.io',done:false},
+  {week:4,skill:'Kubernetes Deployments',resource:'KodeKloud K8s Course',hours:10,url:'https://kodekloud.com',done:false},
+  {week:5,skill:'System Design Patterns',resource:'System Design Primer (GitHub)',hours:15,url:'https://github.com/donnemartin/system-design-primer',done:false},
+  {week:6,skill:'Redis & Caching',resource:'Redis University',hours:8,url:'https://university.redis.com',done:false},
+  {week:7,skill:'AWS Core Services',resource:'AWS Skill Builder',hours:12,url:'https://skillbuilder.aws',done:false},
+  {week:8,skill:'CI/CD with GitHub Actions',resource:'GitHub Actions Docs',hours:8,url:'https://docs.github.com',done:false},
+];
+
+const INTERNSHIPS = [
+  {title:'Backend Engineer Intern',company:'Razorpay',type:'Hybrid',stipend:'₹40,000/mo',match:78,skills:['Python','FastAPI','Redis','PostgreSQL'],matched:['Python','FastAPI'],reason:'Strong Python match, Redis/PostgreSQL gaps fillable in 2 weeks.'},
+  {title:'SDE Intern - Platform',company:'Zerodha',type:'Remote',stipend:'₹35,000/mo',match:71,skills:['Node.js','MongoDB','Docker','REST APIs'],matched:['Node.js','MongoDB','REST APIs'],reason:'Excellent Node.js fit; Docker gap is your main risk.'},
+  {title:'Full Stack Dev Intern',company:'Freshworks',type:'On-site',stipend:'₹30,000/mo',match:65,skills:['React','Node.js','SQL','AWS'],matched:['React','Node.js'],reason:'React + Node strength. AWS learning would boost match significantly.'},
+  {title:'Cloud Backend Intern',company:'PhonePe',type:'Hybrid',stipend:'₹45,000/mo',match:52,skills:['Go','AWS','Kubernetes','PostgreSQL'],matched:['PostgreSQL'],reason:'Role heavily requires Go and K8s — address these first.'},
+];
+
+const PROJECTS = [
+  {title:'Distributed Rate Limiter',skills:'Redis, Python, Docker',time:'2 weeks',level:'Advanced',fills:['Redis','Docker'],relevant:true},
+  {title:'CI/CD Pipeline Builder',skills:'GitHub Actions, Docker, K8s',time:'3 weeks',level:'Advanced',fills:['CI/CD','Kubernetes','Docker'],relevant:true},
+  {title:'URL Shortener with Analytics',skills:'Node.js, Redis, PostgreSQL',time:'1 week',level:'Intermediate',fills:['Redis','PostgreSQL'],relevant:true},
+  {title:'REST API with JWT Auth',skills:'FastAPI, PostgreSQL, Docker',time:'1 week',level:'Beginner',fills:['Docker','PostgreSQL'],relevant:false},
+  {title:'Real-time Chat App',skills:'WebSockets, Redis, Node.js',time:'2 weeks',level:'Intermediate',fills:['Redis'],relevant:false},
+];
+
+const CERTS = [
+  {title:'Certified Kubernetes Administrator (CKA)',platform:'CNCF',cost:'$395',duration:'2-3 months',skill:'Kubernetes',url:'https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/'},
+  {title:'AWS Solutions Architect Associate',platform:'Amazon',cost:'$300',duration:'2-3 months',skill:'AWS',url:'https://aws.amazon.com/certification/'},
+  {title:'Docker Certified Associate',platform:'Docker',cost:'$195',duration:'1-2 months',skill:'Docker',url:'https://training.mirantis.com/dca-certification-exam/'},
+  {title:'Redis Certified Developer',platform:'Redis University',cost:'Free',duration:'2-4 weeks',skill:'Redis',url:'https://university.redis.com/certifications/'},
+];
+
+const INTERVIEW_QS = {
+  'Backend Developer':[
+    {q:'Explain the CAP theorem and how it applies when choosing between MongoDB and PostgreSQL.',cat:'technical'},
+    {q:'How would you design a rate-limiting system that handles 100k requests per second?',cat:'system_design'},
+    {q:'What is the difference between process-level and OS-level threading? How does Node.js use this?',cat:'technical'},
+    {q:'Walk me through how you would optimize a slow SQL query that\'s doing a full table scan.',cat:'technical'},
+    {q:'Describe a time you had to debug a production issue at 2am. What was your process?',cat:'behavioral'},
+  ]
+};
+
+const VERIFY_QS = {
+  'Python':[
+    {id:'p1',q:'What does the `__init__` method do in a Python class?',opts:['Destructor that cleans up','Constructor called when creating an instance','Static method for initialization','Class method decorator'],ans:1},
+    {id:'p2',q:'What is the output of `list(map(lambda x: x**2, [1,2,3]))`?',opts:['[1,4,9]','(1,4,9)','[2,4,6]','Error'],ans:0},
+    {id:'p3',q:'Which of these is a generator expression?',opts:['[x for x in range(10)]','(x for x in range(10))','{x for x in range(10)}','list(range(10))'],ans:1},
+    {id:'p4',q:'What does `@staticmethod` mean in Python?',opts:['Method bound to the instance','Method bound to the class','Method with no implicit first arg','Method that is private'],ans:2},
+    {id:'p5',q:'What is the time complexity of a Python dict lookup?',opts:['O(n)','O(log n)','O(1) average','O(n²)'],ans:2},
+  ],
+  'JavaScript':[
+    {id:'j1',q:'What is the output of `typeof null`?',opts:['"null"','"undefined"','"object"','"boolean"'],ans:2},
+    {id:'j2',q:'What does `Promise.all()` do?',opts:['Runs promises sequentially','Resolves when ALL promises resolve','Resolves when ANY promise resolves','Cancels other promises after first'],ans:1},
+    {id:'j3',q:'What is event bubbling in JavaScript?',opts:['Events fire on child then bubble up to parent','Events fire parent then down to child','Events are queued in order','A memory leak pattern'],ans:0},
+    {id:'j4',q:'What does `===` check vs `==`?',opts:['Same thing','Value only','Value AND type','Reference only'],ans:2},
+    {id:'j5',q:'What is closure in JavaScript?',opts:['A way to close browser tabs','Function that retains access to its outer scope','Module pattern','Arrow function shorthand'],ans:1},
+  ],
+  default:[
+    {id:'d1',q:'What is the time complexity of binary search?',opts:['O(n)','O(n²)','O(log n)','O(1)'],ans:2},
+    {id:'d2',q:'Which data structure uses LIFO (Last In First Out)?',opts:['Queue','Stack','LinkedList','Heap'],ans:1},
+    {id:'d3',q:'What does REST stand for?',opts:['Remote Execution of Services Technology','Representational State Transfer','Rapid Enterprise Software Toolkit','Resource Exchange Standard Template'],ans:1},
+    {id:'d4',q:'In Git, what does `git rebase` do?',opts:['Creates a new branch','Moves commits to a new base','Merges with a merge commit','Deletes old branches'],ans:1},
+    {id:'d5',q:'What is the purpose of a load balancer?',opts:['Store session data','Distribute traffic across servers','Cache database queries','Encrypt HTTP traffic'],ans:1},
+  ]
+};
+
+const AI_RESPONSES = {
+  'What should I learn first?': 'Based on your profile, I recommend starting with **Docker** immediately. It\'s your most critical gap (15% vs 75% required) and is foundational for everything else — Kubernetes, CI/CD, and cloud deployments all build on it.\n\nHere\'s a 2-week plan:\n→ Week 1: Docker fundamentals + containers + images\n→ Week 2: Docker Compose + networking\n\nAfter that, move to Kubernetes which has the next biggest gap.',
+  'Am I ready to apply for internships?': 'Yes! At 62% readiness, you\'re ready to apply — especially for roles that emphasize Python and Node.js. Your strongest matches right now:\n\n🟢 Razorpay (78% match) — apply now\n🟢 Zerodha (71% match) — apply now\n🟡 Freshworks (65% match) — apply soon\n🔴 PhonePe (52% match) — wait 4-6 weeks\n\nI\'d recommend applying to the top 2 while continuing to learn Docker. Many companies value strong Python+API skills over perfect DevOps.',
+  'Review my skill gaps': 'Here\'s your priority breakdown:\n\n🔴 CRITICAL (3 gaps):\n→ Docker: 15% → need 75% (gap: 60%)\n→ Kubernetes: 5% → need 60% (gap: 55%)\n→ System Design: 30% → need 85% (gap: 55%)\n\n🟡 IMPORTANT (4 gaps):\n→ Redis, AWS, CI/CD, PostgreSQL\n\n✅ STRENGTHS: Python (80%), Git (85%), REST APIs (75%)\n\nFocus on Docker first — it unlocks Kubernetes and CI/CD learning automatically.',
+  'Give me a 30-day plan': 'Here\'s your optimized 30-day plan:\n\n**Week 1-2: Docker (8-10 hrs)**\n→ Docker fundamentals, containers, images, Compose\n→ Deploy your existing Node.js project in Docker\n\n**Week 3: System Design basics (6-8 hrs)**\n→ Read System Design Primer on GitHub\n→ Practice: URL shortener, rate limiter designs\n\n**Week 4: Redis + Apply (5-6 hrs)**\n→ Redis basics, caching patterns\n→ Add Redis to your project\n→ Apply to Razorpay and Zerodha\n\nBy Day 30 you\'ll be at ~72% readiness — enough for most intern roles.',
+  'What projects should I build?': 'Based on your gaps, these 3 projects will have the biggest impact:\n\n1️⃣ **Distributed Rate Limiter** (fills: Docker + Redis)\n→ Build with Python/FastAPI + Redis\n→ Containerize with Docker\n→ ~2 weeks, high resume impact\n\n2️⃣ **CI/CD Pipeline** (fills: GitHub Actions + Docker + K8s)\n→ Auto-deploy your existing projects\n→ ~3 weeks, very employer-attractive\n\n3️⃣ **URL Shortener with Analytics** (fills: Redis + PostgreSQL)\n→ Classic interview-worthy project\n→ ~1 week, quick win\n\nStart with #1 — it directly addresses your most critical gaps.',
+};
+
+// ══════════════════════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════════════════════
+function badge(label, color) {
+  const m = {
+    cyan:  'background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.28)',
+    green: 'background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.28)',
+    amber: 'background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.28)',
+    red:   'background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.28)',
+    purple:'background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.28)',
+    gray:  'background:rgba(255,255,255,.05);color:#8ca9c8;border:1px solid rgba(255,255,255,.12)',
+    teal:  'background:rgba(45,212,191,.1);color:#2dd4bf;border:1px solid rgba(45,212,191,.28)',
+  };
+  return `<span class="badge" style="${m[color]||m.cyan}">${label}</span>`;
+}
+
+function skillBar(s) {
+  const color = s.gap <= 0 ? 'var(--green)' : s.importance==='critical' ? 'var(--red)' : 'var(--cyan)';
+  const impBadge = s.gap > 0 ? `${badge(s.importance, s.importance==='critical'?'red':'amber')}` : badge('met ✓','green');
+  return `
+  <div class="skill-bar-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px">
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="font-size:.88rem;font-weight:500">${s.skill}</span>
+        ${badge(s.cat,'gray')} ${impBadge}
+      </div>
+      <span style="font-size:.7rem;font-family:'DM Mono',monospace;color:var(--t3)">${s.your}% / ${s.req}%</span>
+    </div>
+    <div class="progress-track" style="height:7px;position:relative">
+      <div style="position:absolute;height:100%;width:${s.req}%;background:rgba(255,255,255,.07);border-radius:99px"></div>
+      <div style="position:absolute;height:100%;width:${s.your}%;background:${color};border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
+    </div>
+  </div>`;
+}
+
+function toast(msg, type='info') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => t.remove(), 3800);
+}
+
+function showPage(name) {
+  document.querySelectorAll('[id^="page-"]').forEach(el => el.classList.add('page-hidden'));
+  document.querySelectorAll('[id^="nav-"]').forEach(el => el.classList.remove('active'));
+  const pg = document.getElementById('page-'+name);
+  const nv = document.getElementById('nav-'+name);
+  if(pg) { pg.classList.remove('page-hidden'); pg.style.display=''; }
+  if(nv) nv.classList.add('active');
+  closeSidebar();
+  // Re-init pages
+  if(name==='gap') renderGapContent('all');
+  if(name==='roadmap') renderRoadmap();
+  if(name==='chat') initChat();
+  if(name==='internships') renderInternships();
+  if(name==='projects') renderProjects();
+  if(name==='verify') renderVerify();
+  if(name==='jd') initJD();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+
+// ── Dark / Light theme toggle ──────────────────────────────────────────────
+(function initTheme() {
+  const saved = localStorage.getItem('skillpath_theme');
+  const preferLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  const theme = saved || (preferLight ? 'light' : 'dark');
+  applyTheme(theme);
+})();
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('skillpath_theme', theme);
+  const isDark = theme === 'dark';
+  const icon   = document.getElementById('theme-icon');
+  const label  = document.getElementById('theme-label');
+  const track  = document.getElementById('theme-track');
+  const thumb  = document.getElementById('theme-thumb');
+  if (!icon) return;
+  icon.textContent  = isDark ? '☀️' : '🌙';
+  label.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+  track.style.background = isDark ? 'var(--bg4)' : 'var(--cyan)';
+  track.style.border     = isDark ? '1px solid var(--b2)' : '1px solid var(--b3)';
+  thumb.style.left       = isDark ? '2px' : '18px';
+  thumb.style.background = isDark ? 'var(--t3)' : '#fff';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════════════
+//  AUTH — Sign In / Sign Up / Forgot Password
+// ══════════════════════════════════════════════════════════
+const SETUP_ROLES = [
+  'Backend Developer','Full Stack Developer','Data Scientist',
+  'DevOps Engineer','AI Engineer','Frontend Developer',
+  'Mobile Developer','Blockchain Developer'
+];
+const SETUP_SKILLS_LIST = [
+  'Python','JavaScript','TypeScript','Java','C++','Go','Rust',
+  'React','Angular','Vue','Node.js','FastAPI','Django','Spring Boot',
+  'MongoDB','PostgreSQL','MySQL','Redis','Elasticsearch','Firebase',
+  'Docker','Kubernetes','AWS','Azure','GCP','Terraform','CI/CD',
+  'Machine Learning','Deep Learning','TensorFlow','PyTorch',
+  'Git','Linux','REST APIs','GraphQL','Microservices','SQL'
+];
+
+let setupStep = 1;
+let setupData = { role:'', skills:[], goal:'', college:'', degree:'', cgpa:'', year:'', exp:'', github:'', linkedin:'' };
+let selectedSetupSkills = new Set();
+let newUserName = '';
+
+function switchAuthTab(tab) {
+  // Reset errors
+  ['signin-error','signup-error','forgot-sent'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  // Show/hide forms
+  document.getElementById('form-signin').style.display  = tab === 'signin'  ? '' : 'none';
+  document.getElementById('form-signup').style.display  = tab === 'signup'  ? '' : 'none';
+  document.getElementById('form-forgot').style.display  = tab === 'forgot'  ? '' : 'none';
+
+  // Tab button states
+  const btnSignin = document.getElementById('tab-signin');
+  const btnSignup = document.getElementById('tab-signup');
+  if (btnSignin && btnSignup) {
+    if (tab === 'signin') {
+      btnSignin.style.background = 'var(--cyan)'; btnSignin.style.color = '#020810'; btnSignin.style.fontWeight = '700';
+      btnSignup.style.background = 'transparent'; btnSignup.style.color = 'var(--t2)'; btnSignup.style.fontWeight = '500';
+    } else if (tab === 'signup') {
+      btnSignup.style.background = 'var(--cyan)'; btnSignup.style.color = '#020810'; btnSignup.style.fontWeight = '700';
+      btnSignin.style.background = 'transparent'; btnSignin.style.color = 'var(--t2)'; btnSignin.style.fontWeight = '500';
+    } else {
+      btnSignin.style.background = 'transparent'; btnSignin.style.color = 'var(--t2)'; btnSignin.style.fontWeight = '500';
+      btnSignup.style.background = 'transparent'; btnSignup.style.color = 'var(--t2)'; btnSignup.style.fontWeight = '500';
+    }
+  }
+
+  // Update heading
+  const headings = {
+    signin:  { h:'Welcome back',            s:'Sign in to your SkillPath AI account' },
+    signup:  { h:'Create your account',     s:'Start your AI-powered career journey' },
+    forgot:  { h:'Reset your password',     s:'We\'ll send a reset link to your email' },
+  };
+  const hd = headings[tab];
+  if (hd) {
+    const h = document.getElementById('auth-heading');
+    const s = document.getElementById('auth-subheading');
+    if (h) h.textContent = hd.h;
+    if (s) s.textContent = hd.s;
+  }
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  if (!email || !pass) {
+    const err = document.getElementById('signin-error');
+    err.textContent = 'Please enter your email and password.';
+    err.style.display = '';
+    return;
+  }
+  // Demo mode — use demo data but show it clearly
+  // Extract name from email for demo (e.g. john@gmail.com → John)
+  const emailName = email.split('@')[0].replace(/[._-]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  CURRENT_USER = {
+    name: emailName, firstName: emailName.split(' ')[0],
+    role: 'Backend Developer', email: email,
+    skills: ['Python','JavaScript','React','Node.js','MongoDB','REST APIs','Git','SQL'],
+    goal: 'Explore SkillPath AI features',
+    college: '', degree: '', cgpa: '', year: '', github: '', linkedin: '',
+    readiness: 42, isDemo: true,
+  };
+  document.getElementById('screen-auth').style.display = 'none';
+  document.getElementById('screen-app').style.display  = 'flex';
+  updateUIForUser();
+  renderDashboard();
+  chatInitialized = false;
+  toast('Welcome! Exploring in demo mode 👋', 'info');
+}
+
+function doSignup() {
+  const name    = document.getElementById('reg-name').value.trim();
+  const email   = document.getElementById('reg-email').value.trim();
+  const pass    = document.getElementById('reg-password').value;
+  const confirm = document.getElementById('reg-confirm').value;
+  const err     = document.getElementById('signup-error');
+
+  if (!name || !email || !pass || !confirm) {
+    err.textContent = 'Please fill in all fields.';
+    err.style.display = ''; return;
+  }
+  if (pass.length < 8) {
+    err.textContent = 'Password must be at least 8 characters.';
+    err.style.display = ''; return;
+  }
+  if (pass !== confirm) {
+    err.textContent = 'Passwords do not match. Please try again.';
+    err.style.display = ''; return;
+  }
+  err.style.display = 'none';
+  newUserName = name.split(' ')[0];
+
+  // Pre-fill CURRENT_USER with signup data (will be completed in wizard)
+  CURRENT_USER = {
+    name: name,
+    firstName: name.split(' ')[0],
+    role: '',
+    email: email,
+    skills: [],
+    goal: '',
+    college: '', degree: '', cgpa: '', year: '',
+    github: '', linkedin: '',
+    readiness: 0,
+    isDemo: false,
+  };
+
+  // Go to setup wizard
+  document.getElementById('screen-auth').style.display  = 'none';
+  document.getElementById('screen-setup').style.display = '';
+  setupStep = 1;
+  selectedSetupSkills = new Set();
+  setupData = { role:'', skills:[], goal:'', college:'', degree:'', cgpa:'', year:'', exp:'', github:'', linkedin:'' };
+  renderSetupStep(1);
+  window.scrollTo(0, 0);
+}
+
+function sendReset() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) {
+    document.getElementById('forgot-email').focus(); return;
+  }
+  document.getElementById('forgot-form-inner').style.display = 'none';
+  document.getElementById('forgot-sent').style.display = '';
+  setTimeout(() => switchAuthTab('signin'), 4000);
+}
+
+// ══════════════════════════════════════════════════════════
+//  SETUP WIZARD
+// ══════════════════════════════════════════════════════════
+function renderSetupStep(step) {
+  // Show/hide step panels
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById('setup-step-'+i);
+    if (el) el.style.display = i === step ? '' : 'none';
+  });
+
+  // Progress bar
+  const bar = document.getElementById('setup-progress-bar');
+  if (bar) bar.style.width = (step / 4 * 100) + '%';
+
+  const labels = ['Target Role','Skills &amp; Goals','Academic Info','GitHub &amp; Summary'];
+  document.getElementById('setup-step-label').innerHTML = `Step ${step} of 4 — ${labels[step-1]}`;
+  document.getElementById('setup-step-count').textContent = `${step} / 4`;
+
+  // Back button
+  const backBtn = document.getElementById('setup-back-btn');
+  if (backBtn) backBtn.style.display = step > 1 ? '' : 'none';
+
+  // Next button label
+  const nextBtn = document.getElementById('setup-next-btn');
+  if (nextBtn) nextBtn.textContent = step === 4 ? 'Go to Dashboard →' : 'Next →';
+
+  if (step === 1) renderRoleGrid();
+  if (step === 2) renderSkillChips();
+  if (step === 4) renderSetupSummary();
+}
+
+function renderRoleGrid() {
+  const grid = document.getElementById('role-grid');
+  if (!grid) return;
+  grid.innerHTML = SETUP_ROLES.map(r => {
+    const sel = setupData.role === r;
+    return `<button onclick="selectRole('${r}')" style="padding:11px 10px;border-radius:10px;font-size:.85rem;font-weight:${sel?'600':'400'};text-align:left;cursor:pointer;transition:all .15s;border:1px solid ${sel?'var(--cyan)':'var(--border)'};background:${sel?'var(--cdim)':'var(--bg3)'};color:${sel?'var(--cyan)':'var(--t2)'}">
+      ${sel?'✓ ':''}${r}
+    </button>`;
+  }).join('');
+}
+
+function selectRole(role) {
+  setupData.role = role;
+  renderRoleGrid();
+}
+
+function renderSkillChips() {
+  const wrap = document.getElementById('skill-chips');
+  if (!wrap) return;
+  wrap.innerHTML = SETUP_SKILLS_LIST.map(s => {
+    const sel = selectedSetupSkills.has(s);
+    return `<button onclick="toggleSetupSkill('${s}')" style="padding:6px 14px;border-radius:99px;font-size:.8rem;font-weight:${sel?'600':'400'};cursor:pointer;transition:all .15s;border:1px solid ${sel?'var(--cyan)':'var(--border)'};background:${sel?'var(--cdim)':'var(--bg3)'};color:${sel?'var(--cyan)':'var(--t2)'}">
+      ${sel?'✓ ':''}${s}
+    </button>`;
+  }).join('');
+}
+
+function toggleSetupSkill(skill) {
+  if (selectedSetupSkills.has(skill)) selectedSetupSkills.delete(skill);
+  else selectedSetupSkills.add(skill);
+  renderSkillChips();
+}
+
+function addCustomSkill() {
+  const input = document.getElementById('custom-skill-input');
+  const val = input.value.trim();
+  if (!val) return;
+  SETUP_SKILLS_LIST.push(val);
+  selectedSetupSkills.add(val);
+  input.value = '';
+  renderSkillChips();
+}
+
+function renderSetupSummary() {
+  const gh = document.getElementById('setup-github').value.trim();
+  const li = document.getElementById('setup-linkedin').value.trim();
+  const skills = Array.from(selectedSetupSkills);
+  const goal   = document.getElementById('setup-goal').value.trim();
+  const summary = document.getElementById('setup-summary');
+  if (!summary) return;
+  summary.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <div><span style="color:var(--t3);font-size:.72rem;font-family:'DM Mono',monospace">TARGET ROLE</span><br><span style="color:var(--text);font-weight:500">${setupData.role || '—'}</span></div>
+      <div><span style="color:var(--t3);font-size:.72rem;font-family:'DM Mono',monospace">SKILLS (${skills.length})</span><br><span style="color:var(--cyan)">${skills.slice(0,8).join(', ')}${skills.length>8?'...':''}</span></div>
+      ${goal?`<div><span style="color:var(--t3);font-size:.72rem;font-family:'DM Mono',monospace">GOAL</span><br><span style="color:var(--text)">${goal.slice(0,100)}${goal.length>100?'...':''}</span></div>`:''}
+      ${document.getElementById('setup-college').value?`<div><span style="color:var(--t3);font-size:.72rem;font-family:'DM Mono',monospace">COLLEGE</span><br><span style="color:var(--text)">${document.getElementById('setup-college').value}</span></div>`:''}
+      <div><span style="color:var(--t3);font-size:.72rem;font-family:'DM Mono',monospace">GITHUB</span><br><span style="${gh?'color:var(--green)':'color:var(--t3)'}">${gh||'Not added'}</span></div>
+    </div>`;
+}
+
+function setupNext() {
+  if (setupStep === 1 && !setupData.role) {
+    toast('Please select a target role to continue', 'error'); return;
+  }
+  if (setupStep < 4) {
+    setupStep++;
+    renderSetupStep(setupStep);
+    window.scrollTo(0, 0);
+  } else {
+    finishSetup();
+  }
+}
+
+function setupBack() {
+  if (setupStep > 1) {
+    setupStep--;
+    renderSetupStep(setupStep);
+    window.scrollTo(0, 0);
+  }
+}
+
+function finishSetup() {
+  // Save all wizard data into CURRENT_USER
+  const skills = Array.from(selectedSetupSkills);
+  const role   = setupData.role || 'Backend Developer';
+
+  CURRENT_USER.role      = role;
+  CURRENT_USER.skills    = skills;
+  CURRENT_USER.goal      = document.getElementById('setup-goal')?.value?.trim() || '';
+  CURRENT_USER.college   = document.getElementById('setup-college')?.value?.trim() || '';
+  CURRENT_USER.degree    = document.getElementById('setup-degree')?.value?.trim() || '';
+  CURRENT_USER.cgpa      = document.getElementById('setup-cgpa')?.value?.trim() || '';
+  CURRENT_USER.year      = document.getElementById('setup-year')?.value?.trim() || '';
+  CURRENT_USER.github    = document.getElementById('setup-github')?.value?.trim() || '';
+  CURRENT_USER.linkedin  = document.getElementById('setup-linkedin')?.value?.trim() || '';
+
+  // Calculate initial readiness based on skills added
+  const gaps   = ROLE_SKILL_GAPS[role] || ROLE_SKILL_GAPS['Backend Developer'];
+  const needed = gaps.filter(g => g.importance === 'critical').length;
+  const have   = skills.length;
+  CURRENT_USER.readiness = Math.min(85, Math.max(10, Math.round((have / Math.max(needed + 3, 8)) * 100)));
+
+  document.getElementById('screen-setup').style.display = 'none';
+  document.getElementById('screen-app').style.display   = 'flex';
+  updateUIForUser();
+  renderDashboard();
+  chatInitialized = false;
+  toast('Welcome ' + (CURRENT_USER.firstName || '') + '! Your profile is ready 🚀', 'success');
+}
+
+function skipSetup() {
+  // Still set a sensible default role so the app doesn't feel broken
+  if (!CURRENT_USER.role) CURRENT_USER.role = 'Backend Developer';
+  CURRENT_USER.readiness = 15;
+  document.getElementById('screen-setup').style.display = 'none';
+  document.getElementById('screen-app').style.display   = 'flex';
+  updateUIForUser();
+  renderDashboard();
+  chatInitialized = false;
+  toast('Welcome ' + (CURRENT_USER.firstName || '') + '! Complete your profile anytime.', 'info');
+}
+
+function doLogout() {
+  // Full reset
+  CURRENT_USER = { name:'', firstName:'', role:'', email:'', skills:[], goal:'',
+    college:'', degree:'', cgpa:'', year:'', github:'', linkedin:'', readiness:0, isDemo:false };
+  chatInitialized = false;
+  roadmapData = [...ROADMAP];
+  internFilter = 'all';
+  // Clear profile inputs
+  ['p-name','p-college','p-degree','p-cgpa','p-year','p-github'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  const pr = document.getElementById('p-role');
+  if(pr) pr.selectedIndex = 0;
+  // Reset sidebar
+  const av = document.getElementById('sb-avatar'); if(av) av.textContent = '?';
+  const sn = document.getElementById('sb-name');   if(sn) sn.textContent = '—';
+  const sr = document.getElementById('sb-ready');  if(sr) sr.textContent = '—';
+  const sp = document.getElementById('sb-progress'); if(sp) sp.style.width = '0%';
+  document.getElementById("screen-app").style.display  = "none";
+  document.getElementById("screen-auth").style.display = "flex";
+  switchAuthTab("signin");
+  toast("Signed out successfully", "success");
+}
+
+// ══════════════════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════════════════
+function renderDashboard() {
+  const gaps = getSkillGaps();
+  const top5 = gaps.filter(s=>s.gap>0).slice(0,5);
+  const el = document.getElementById('dash-skill-bars');
+  if (el) {
+    if (top5.length > 0) {
+      el.innerHTML = top5.map(skillBar).join('');
+    } else {
+      el.innerHTML = '<div style="padding:16px 0;color:var(--t3);font-size:.88rem;text-align:center">Add your skills in Profile to see your gap analysis here.</div>';
+    }
+  }
+  // Update gap subheading
+  const gsp = document.querySelector('#page-dashboard .section-header p');
+  if (gsp) gsp.textContent = 'For ' + CURRENT_USER.role;
+}
+
+// ══════════════════════════════════════════════════════════
+//  GAP ANALYZER
+// ══════════════════════════════════════════════════════════
+function renderGapContent(tab) {
+  const el = document.getElementById('gap-content');
+  if(!el) return;
+  const gaps = getSkillGaps();
+  if(tab==='met') {
+    const met = gaps.filter(s=>s.met);
+    if (met.length === 0) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t3)">No skills met yet — add skills in your Profile to track progress.</div>';
+    } else {
+      el.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:8px;padding:8px 0">${met.map(s=>badge('✓ '+s.skill,'green')).join('')}</div>`;
+    }
+  } else {
+    let items = tab==='all' ? gaps.filter(s=>!s.met)
+      : tab==='critical'  ? gaps.filter(s=>s.importance==='critical'&&s.gap>0)
+      : gaps.filter(s=>s.importance==='important'&&s.gap>0);
+    if (items.length === 0) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t3)">No gaps in this category for your role.</div>';
+    } else {
+      el.innerHTML = items.map(skillBar).join('');
+    }
+  }
+  // Update gap counts in tabs
+  const critical = gaps.filter(s=>s.importance==='critical'&&s.gap>0).length;
+  const important = gaps.filter(s=>s.importance==='important'&&s.gap>0).length;
+  const met = gaps.filter(s=>s.met).length;
+  const tabs = document.querySelectorAll('#gap-tabs .tab-item');
+  if(tabs[1]) tabs[1].textContent = 'Critical (' + critical + ')';
+  if(tabs[2]) tabs[2].textContent = 'Important (' + important + ')';
+  if(tabs[3]) tabs[3].textContent = 'Met (' + met + ')';
+  // Update stats cards in gap page
+  const statCards = document.querySelectorAll('#page-gap .card .grid2, #page-gap .card');
+  // Update gap page mini stats
+  const gapStats = document.getElementById('gap-mini-stats');
+  if (gapStats) {
+    gapStats.innerHTML = `
+      <div style="text-align:center;padding:10px 8px;background:var(--bg3);border-radius:8px"><div style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--red)">${critical}</div><div style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:2px">Critical Gaps</div></div>
+      <div style="text-align:center;padding:10px 8px;background:var(--bg3);border-radius:8px"><div style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--amber)">${important}</div><div style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:2px">Important Gaps</div></div>
+      <div style="text-align:center;padding:10px 8px;background:var(--bg3);border-radius:8px"><div style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--green)">${met}</div><div style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:2px">Skills Met</div></div>
+      <div style="text-align:center;padding:10px 8px;background:var(--bg3);border-radius:8px"><div style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--cyan)">${gaps.length}</div><div style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:2px">Total Skills</div></div>
+    `;
+  }
+}
+function switchGapTab(tab, btn) {
+  document.querySelectorAll('#gap-tabs .tab-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGapContent(tab);
+}
+
+// ══════════════════════════════════════════════════════════
+//  ROADMAP
+// ══════════════════════════════════════════════════════════
+let roadmapData = [...ROADMAP];
+function renderRoadmap() {
+  const doneCount = roadmapData.filter(s=>s.done).length;
+  const lbl = document.getElementById('roadmap-progress-label');
+  const bar = document.getElementById('roadmap-progress-bar');
+  if(lbl) lbl.textContent = `${doneCount}/${roadmapData.length} weeks`;
+  if(bar) bar.style.width = `${(doneCount/roadmapData.length)*100}%`;
+
+  const container = document.getElementById('roadmap-steps');
+  if(!container) return;
+  container.innerHTML = roadmapData.map((s,i) => {
+    const isCurrent = !s.done && i===doneCount;
+    const borderColor = s.done ? 'var(--green)' : isCurrent ? 'var(--cyan)' : 'var(--border)';
+    const circBg = s.done ? 'var(--green)' : isCurrent ? 'var(--cdim)' : 'var(--bg4)';
+    const circBorder = s.done ? 'var(--green)' : isCurrent ? 'var(--cyan)' : 'var(--border)';
+    const circColor = s.done ? '#020810' : isCurrent ? 'var(--cyan)' : 'var(--t3)';
+    const circText = s.done ? '✓' : `W${s.week}`;
+    return `
+    <div class="card" style="border-left:3px solid ${borderColor};padding:14px 18px">
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <div style="width:34px;height:34px;border-radius:50%;flex-shrink:0;background:${circBg};border:1px solid ${circBorder};display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:${circColor};font-family:'DM Mono',monospace">${circText}</div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+            <div>
+              <div style="font-size:.95rem;font-weight:600">Week ${s.week}: ${s.skill}</div>
+              <div style="font-size:.8rem;color:var(--t3);margin-top:3px">📚 ${s.resource} · ~${s.hours}h <a href="${s.url}" target="_blank" style="margin-left:8px;font-size:.75rem;color:var(--cyan)">Open →</a></div>
+            </div>
+            ${isCurrent ? `<button class="btn-primary" onclick="markRoadmapDone(${s.week})" style="font-size:.78rem;padding:5px 14px">Mark Done ✓</button>` : s.done ? '' : badge('Locked','gray')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function markRoadmapDone(week) {
+  roadmapData = roadmapData.map(s=>s.week===week?{...s,done:true}:s);
+  renderRoadmap();
+  toast('Week '+week+' marked complete! 🎉','success');
+}
+
+// ══════════════════════════════════════════════════════════
+//  CHAT
+// ══════════════════════════════════════════════════════════
+const QUICK_PROMPTS = ['What should I learn first?','Am I ready to apply for internships?','Review my skill gaps','Give me a 30-day plan','What projects should I build?'];
+let chatInitialized = false;
+
+function initChat() {
+  if(chatInitialized) return;
+  chatInitialized = true;
+  const msgs = document.getElementById('chat-messages');
+  msgs.innerHTML = '';
+  const u = CURRENT_USER;
+  const firstName = u.firstName || u.name?.split(' ')[0] || 'there';
+  const roleStr = u.role || 'your target role';
+  const readStr = u.readiness || 0;
+  const skillCount = u.skills?.length || 0;
+  let greet;
+  if (!u.role) {
+    greet = `Hi ${firstName}! I'm your AI Career Advisor. To get started, please set your target role in your Profile — that unlocks your personalized skill gap analysis, roadmap, and advice!`;
+  } else if (skillCount === 0) {
+    greet = `Hi ${firstName}! I'm your AI Career Advisor. You're targeting ${roleStr}. Add your skills in Profile (or upload your resume) and I'll give you a fully personalized analysis!`;
+  } else {
+    greet = `Hi ${firstName}! I'm your AI Career Advisor. You're targeting ${roleStr} with ${skillCount} skills tracked at ${readStr}% readiness. Ask me anything about your career path!`;
+  }
+  appendAIMessage(greet);
+
+  const qp = document.getElementById('quick-prompts');
+  qp.innerHTML = QUICK_PROMPTS.map(q=>`<button onclick="sendChatMsg('${q.replace(/'/g,"\\'")}')" style="font-size:.75rem;padding:4px 11px;border-radius:99px;background:var(--bg3);color:var(--t3);border:1px solid var(--border);white-space:nowrap;transition:all .12s" onmouseenter="this.style.borderColor='var(--b2)';this.style.color='var(--text)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--t3)'">${q}</button>`).join('');
+}
+
+function appendUserMessage(text) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;justify-content:flex-end';
+  div.innerHTML = `<div class="bubble-user">${text}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendAIMessage(text) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;align-items:flex-start;gap:8px';
+  div.innerHTML = `
+    <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--green));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#020810;flex-shrink:0;margin-top:4px;font-family:'Syne',sans-serif">S</div>
+    <div class="bubble-ai"><div style="font-size:.65rem;color:var(--cyan);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">AI Advisor</div><div style="white-space:pre-wrap">${text}</div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function sendChat() { sendChatMsg(document.getElementById('chat-input').value); }
+function sendChatMsg(text) {
+  text = text.trim();
+  if(!text) return;
+  document.getElementById('chat-input').value = '';
+  appendUserMessage(text);
+  // Typing indicator
+  const msgs = document.getElementById('chat-messages');
+  const typing = document.createElement('div');
+  typing.id = 'typing-indicator';
+  typing.style.cssText = 'display:flex;gap:8px;align-items:center';
+  typing.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--green));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#020810;font-family:'Syne',sans-serif">S</div><div class="bubble-ai" style="display:flex;gap:5px;align-items:center;padding:12px 16px">${[0,1,2].map(i=>`<div style="width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 1.2s infinite ${i*0.2}s"></div>`).join('')}</div>`;
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    typing.remove();
+    const u = CURRENT_USER;
+    const firstName = u.firstName || u.name?.split(' ')[0] || 'there';
+    const gaps = getSkillGaps().filter(g=>g.gap>0).slice(0,3).map(g=>g.skill+' ('+g.gap+'% gap)').join(', ');
+    const reply = AI_RESPONSES[text] || `Great question, ${firstName}! Based on your profile as a ${u.role || 'tech'} aspirant at ${u.readiness || 0}% readiness:\n\nYour top skill gaps are: ${gaps || 'not yet analyzed — add skills in your Profile first'}.\n\nWould you like a specific action plan for any of these areas?`;
+    appendAIMessage(reply);
+  }, 1000 + Math.random()*800);
+}
+
+// ══════════════════════════════════════════════════════════
+//  JD PARSER
+// ══════════════════════════════════════════════════════════
+function initJD() {
+  document.getElementById('jd-input').addEventListener('input', function() {
+    document.getElementById('jd-char-count').textContent = `${this.value.length} / 5000 chars`;
+  });
+  renderJDHistory();
+}
+function switchJDTab(tab, btn) {
+  document.querySelectorAll('.tab-nav .tab-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('jd-parse-tab').style.display  = tab==='parse'   ? '' : 'none';
+  document.getElementById('jd-history-tab').style.display= tab==='history' ? '' : 'none';
+}
+function analyzeJD() {
+  const jd = document.getElementById('jd-input').value.trim();
+  if(!jd) return;
+  const result = document.getElementById('jd-result');
+  result.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:var(--t3);padding:20px"><div class="spinner"></div> Analyzing job description...</div>';
+  result.style.display = '';
+  setTimeout(()=>{
+    const match = 68 + Math.floor(Math.random()*20);
+    const mc = match>=75?'var(--green)':match>=50?'var(--amber)':'var(--red)';
+    result.innerHTML = `
+    <div class="fade-up" style="display:flex;flex-direction:column;gap:14px">
+      <div class="card" style="text-align:center;padding:28px 20px;border-color:${mc}55">
+        <div style="font-size:3rem;font-weight:800;font-family:'Syne',sans-serif;color:${mc};line-height:1">${match}%</div>
+        <div style="font-size:.9rem;color:var(--t2);margin-top:6px">Match for <strong style="color:var(--text)">Backend Developer</strong></div>
+        <div style="font-size:.8rem;color:var(--t3);margin-top:4px;font-family:'DM Mono',monospace">Mid-level · 4 of 7 required skills matched</div>
+        <div style="max-width:380px;margin:14px auto 0;height:8px;background:var(--bg4);border-radius:99px;overflow:hidden"><div style="height:100%;width:${match}%;background:${mc};border-radius:99px;transition:width 1s ease"></div></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><div style="font-size:.7rem;color:var(--green);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">You Have ✓</div><div style="display:flex;flex-wrap:wrap;gap:6px">${['Python','Node.js','REST APIs','MongoDB'].map(s=>badge(s,'green')).join('')}</div></div>
+        <div class="card"><div style="font-size:.7rem;color:var(--red);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Missing Skills</div><div style="display:flex;flex-wrap:wrap;gap:6px">${['Docker','Kubernetes','Redis'].map(s=>badge(s,'red')).join('')}</div></div>
+      </div>
+      <div class="card" style="border-color:var(--cdim)"><div style="font-size:.7rem;color:var(--cyan);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">AI Explanation</div><p style="margin:0;font-size:.88rem;line-height:1.7">You have a solid foundation in Python and backend frameworks. The main gaps are in containerization (Docker/K8s) and caching (Redis). If you spend 3-4 weeks on Docker, your match would jump to ~82%.</p></div>
+    </div>`;
+  }, 1500);
+}
+const JD_HISTORY = [
+  {role:'Full Stack Engineer @ Swiggy',match:71,date:'2025-03-10',matched:['React','Node.js','MongoDB'],missing:['AWS','Redis']},
+  {role:'Backend Developer @ Groww',match:78,date:'2025-03-08',matched:['Python','FastAPI','PostgreSQL'],missing:['Docker']},
+  {role:'SDE-1 @ Flipkart',match:62,date:'2025-03-05',matched:['Python','REST APIs'],missing:['Java','Spring Boot','Kafka']},
+];
+function renderJDHistory() {
+  const mc = p=>p>=75?'var(--green)':p>=50?'var(--amber)':'var(--red)';
+  document.getElementById('jd-history-tab').innerHTML = JD_HISTORY.map(h=>`
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div><div style="font-size:.9rem;font-weight:600">${h.role}</div><div style="font-size:.75rem;color:var(--t3);font-family:'DM Mono',monospace;margin-top:2px">${h.date}</div></div>
+      <div style="text-align:center"><div style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;color:${mc(h.match)}">${h.match}%</div><div style="font-size:.7rem;color:var(--t3);font-family:'DM Mono',monospace">match</div></div>
+    </div>
+    <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px">${h.matched.map(s=>badge(s,'green')).join('')}${h.missing.map(s=>badge(s,'red')).join('')}</div>
+  </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+//  INTERNSHIPS
+// ══════════════════════════════════════════════════════════
+let internFilter = 'all';
+function renderInternships() {
+  const btns = document.getElementById('intern-filter-btns');
+  btns.innerHTML = [['all','All'],['remote','Remote'],['hybrid','Hybrid'],['on-site','On-site']].map(([v,l])=>`
+  <button onclick="filterInternships('${v}')" id="intern-btn-${v}" style="padding:6px 16px;border-radius:8px;font-size:.83rem;background:${v===internFilter?'var(--cyan)':'var(--bg3)'};color:${v===internFilter?'#020810':'var(--t3)'};border:none;font-weight:${v===internFilter?600:400};transition:all .15s;cursor:pointer">${l}</button>`).join('');
+  const mc = p=>p>=75?'var(--green)':p>=55?'var(--amber)':'var(--red)';
+  const filtered = internFilter==='all' ? INTERNSHIPS : INTERNSHIPS.filter(i=>i.type.toLowerCase()===internFilter);
+  document.getElementById('internships-list').innerHTML = filtered.map((item,i)=>`
+  <div class="card fade-up" style="border-left:3px solid ${mc(item.match)}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+      <div><div style="font-size:1rem;font-weight:700">${item.title}</div><div style="font-size:.85rem;color:var(--t2);margin-top:3px">${item.company} · ${item.type} · ${item.stipend}</div></div>
+      <div style="text-align:center;min-width:60px"><div style="font-size:1.6rem;font-weight:800;font-family:'Syne',sans-serif;color:${mc(item.match)};line-height:1">${item.match}%</div><div style="font-size:.65rem;color:var(--t3);font-family:'DM Mono',monospace">MATCH</div></div>
+    </div>
+    <div class="progress-track" style="height:4px"><div class="progress-fill" style="width:${item.match}%;background:${mc(item.match)}"></div></div>
+    <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;align-items:center">
+      <span style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace">SKILLS:</span>
+      ${item.skills.map(s=>badge(s,item.matched.includes(s)?'green':'red')).join('')}
+    </div>
+    ${item.reason?`<div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border-radius:8px;font-size:.8rem;color:var(--t3);border-left:2px solid var(--b2)">💡 ${item.reason}</div>`:''}
+    <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+      <button class="btn-primary" onclick="toast('Opening application...','info')" style="font-size:.78rem;padding:5px 14px">Apply Now →</button>
+      <span style="font-size:.75rem;color:var(--t3)">Helpful?</span>
+      <button onclick="toast('Thanks for your feedback!','success')" style="background:var(--gdim);border:1px solid rgba(74,222,128,.3);color:var(--green);padding:3px 10px;border-radius:6px;font-size:.78rem">👍</button>
+      <button onclick="toast('Feedback noted.','info')" style="background:var(--rdim);border:1px solid rgba(248,113,113,.3);color:var(--red);padding:3px 10px;border-radius:6px;font-size:.78rem">👎</button>
+    </div>
+  </div>`).join('');
+}
+function filterInternships(f) {
+  internFilter = f;
+  renderInternships();
+}
+
+// ══════════════════════════════════════════════════════════
+//  PROJECTS
+// ══════════════════════════════════════════════════════════
+function renderProjects() {
+  const levelColor = l=>l==='Advanced'?'red':l==='Intermediate'?'amber':'cyan';
+  document.getElementById('projects-content').innerHTML = PROJECTS.map(p=>`
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      <div><div style="font-size:1rem;font-weight:700">${p.title}</div><div style="font-size:.82rem;color:var(--t3);margin-top:3px">🛠 ${p.skills} · ⏱ ${p.time}</div></div>
+      ${badge(p.level,levelColor(p.level))}
+    </div>
+    ${p.fills?.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:.72rem;color:var(--t3);font-family:'DM Mono',monospace">FILLS GAPS:</span>${p.fills.map(f=>badge(f,'teal')).join('')}</div>`:''}
+    ${p.relevant?`<div style="margin-top:8px;font-size:.75rem;color:var(--green);display:flex;align-items:center;gap:4px">◆ Recommended — fills your current gaps</div>`:''}
+  </div>`).join('');
+
+  document.getElementById('certs-content').innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">${CERTS.map(c=>`
+  <div class="card">
+    <div style="font-size:.9rem;font-weight:700;margin-bottom:6px">${c.title}</div>
+    ${[['Platform',c.platform],['Cost',c.cost],['Duration',c.duration],['Covers',c.skill]].map(([k,v])=>`<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px"><span style="color:var(--t3);font-family:'DM Mono',monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">${k}</span><span style="color:var(--t2)">${v}</span></div>`).join('')}
+    <a href="${c.url}" target="_blank" class="btn-ghost" style="display:inline-block;font-size:.78rem;padding:5px 14px;margin-top:10px">View Course →</a>
+  </div>`).join('')}</div>`;
+}
+function switchProjectTab(tab, btn) {
+  document.querySelectorAll('#page-projects .tab-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['projects','certs','generator'].forEach(t=>{ document.getElementById(t+'-content').style.display=t===tab?'':'none'; });
+}
+function generateDesc() {
+  const desc = document.getElementById('gen-input').value.trim();
+  if(!desc) return;
+  const btn = event.target;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:15px;height:15px"></span> Generating...';
+  setTimeout(()=>{
+    const bullets = [
+      `Developed ${desc.split(' ').slice(0,4).join(' ')} system using Python and collaborative filtering algorithms, achieving 94% recommendation accuracy across 50,000+ user interactions`,
+      `Built and deployed a ${desc.split(' ').slice(0,3).join(' ')} application leveraging FastAPI and Docker containerization, reducing API response time by 40% compared to monolithic architecture`,
+      `Engineered a scalable ${desc.split(' ').slice(0,3).join(' ')} platform with Redis caching layer and PostgreSQL backend, supporting 10,000 concurrent users with 99.9% uptime`,
+    ];
+    document.getElementById('gen-output').textContent = bullets[Math.floor(Math.random()*bullets.length)];
+    document.getElementById('gen-result').style.display = '';
+    btn.disabled = false; btn.innerHTML = 'Generate Bullet Point →';
+  }, 1500);
+}
+
+// ══════════════════════════════════════════════════════════
+//  INTERVIEW
+// ══════════════════════════════════════════════════════════
+let iState = {qs:[], qi:0, scores:[]};
+function startInterview() {
+  const role = document.getElementById('interview-role').value;
+  iState.qs = INTERVIEW_QS[role] || INTERVIEW_QS['Backend Developer'];
+  iState.qi = 0; iState.scores = [];
+  document.getElementById('interview-setup').style.display = 'none';
+  document.getElementById('interview-done').style.display  = 'none';
+  renderQuestion();
+}
+function renderQuestion() {
+  const q = iState.qs[iState.qi];
+  const catColor = c=>c==='technical'?'cyan':c==='system_design'?'purple':'amber';
+  document.getElementById('interview-question').style.display = '';
+  document.getElementById('interview-question').innerHTML = `
+  <div style="display:flex;gap:6px;margin-bottom:16px">
+    ${iState.qs.map((_,i)=>`<div class="q-progress-bar" style="background:${i<iState.qi?'var(--green)':i===iState.qi?'var(--cyan)':'var(--bg4)'}"></div>`).join('')}
+  </div>
+  <div class="card" style="border-color:var(--cdim);margin-bottom:16px">
+    <div style="display:flex;gap:8px;margin-bottom:10px">${badge(`Q${iState.qi+1}/${iState.qs.length}`,'cyan')}${badge(q.cat.replace('_',' '),catColor(q.cat))}</div>
+    <p style="margin:0;font-size:1rem;font-weight:500;line-height:1.7">${q.q}</p>
+  </div>
+  <textarea id="i-answer" rows="8" placeholder="Type your answer here. Explain your reasoning — be as detailed as you would in a real interview..." style="margin-bottom:12px"></textarea>
+  <div style="display:flex;gap:10px">
+    <button class="btn-primary" onclick="submitAnswer()" style="display:flex;align-items:center;gap:8px">Submit Answer →</button>
+    <button class="btn-ghost" onclick="skipQuestion()" style="font-size:.83rem">Skip</button>
+  </div>`;
+}
+function submitAnswer() {
+  const ans = document.getElementById('i-answer').value.trim();
+  if(!ans) return;
+  const score = 5 + Math.floor(Math.random()*5);
+  iState.scores.push(score);
+  const q = iState.qs[iState.qi];
+  document.getElementById('interview-question').innerHTML = `
+  <div style="display:flex;gap:6px;margin-bottom:16px">
+    ${iState.qs.map((_,i)=>`<div class="q-progress-bar" style="background:${i<=iState.qi?'var(--green)':'var(--bg4)'}"></div>`).join('')}
+  </div>
+  <div class="card" style="border-color:var(--cdim);margin-bottom:16px"><p style="margin:0;font-size:1rem;font-weight:500;line-height:1.7">${q.q}</p></div>
+  <div class="card fade-up" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+    <div style="text-align:center;min-width:80px"><div style="font-size:2rem;font-weight:800;font-family:'Syne',sans-serif;color:${score>=7?'var(--green)':score>=5?'var(--amber)':'var(--red)'}">${score}/10</div><div style="font-size:.7rem;color:var(--t3);font-family:'DM Mono',monospace">SCORE</div></div>
+    <div style="flex:1;font-size:.85rem;color:var(--t2)">${score>=8?'Excellent answer! You demonstrated strong conceptual understanding and practical knowledge.':score>=6?'Good answer. You covered the main points. Consider adding more concrete examples next time.':'Partial credit. You touched on some points but missed key concepts. Review this topic.'}</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+    <div class="card"><div style="font-size:.7rem;color:var(--green);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">What you got right</div>${['Correct core concept','Good structure','Practical example'].map(p=>`<div style="font-size:.83rem;color:var(--t2);padding:3px 0;display:flex;gap:6px"><span style="color:var(--green);flex-shrink:0">✓</span>${p}</div>`).join('')}</div>
+    <div class="card"><div style="font-size:.7rem;color:var(--red);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">What was missing</div>${['Edge cases not covered','Scalability considerations','Specific metrics'].map(p=>`<div style="font-size:.83rem;color:var(--t2);padding:3px 0;display:flex;gap:6px"><span style="color:var(--red);flex-shrink:0">→</span>${p}</div>`).join('')}</div>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button class="btn-primary" onclick="nextQuestion()">${iState.qi<iState.qs.length-1?'Next Question →':'See Results →'}</button>
+    <button class="btn-ghost" onclick="renderQuestion()" style="font-size:.83rem">Retry</button>
+  </div>`;
+}
+function skipQuestion() { iState.scores.push(0); nextQuestion(); }
+function nextQuestion() {
+  if(iState.qi < iState.qs.length-1) { iState.qi++; renderQuestion(); }
+  else { showInterviewDone(); }
+}
+function showInterviewDone() {
+  document.getElementById('interview-question').style.display = 'none';
+  const avg = iState.scores.length ? Math.round(iState.scores.reduce((a,b)=>a+b,0)/iState.scores.length) : 0;
+  const color = avg>=7?'var(--green)':avg>=5?'var(--amber)':'var(--red)';
+  document.getElementById('interview-done').style.display = '';
+  document.getElementById('interview-done').innerHTML = `
+  <div class="card fade-up" style="max-width:480px;text-align:center;padding:36px 28px;margin:0 auto">
+    <div style="font-size:2.5rem;font-weight:800;font-family:'Syne',sans-serif;color:${color};margin-bottom:8px">${avg}/10</div>
+    <h3 style="margin-bottom:8px">Interview Complete</h3>
+    <p style="margin-bottom:16px">Average score across ${iState.scores.length} questions</p>
+    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:20px">
+      ${iState.scores.map((s,i)=>`<div style="text-align:center;padding:8px 12px;background:var(--bg3);border-radius:8px;min-width:50px"><div style="font-size:1rem;font-weight:700;color:${s>=7?'var(--green)':s>=5?'var(--amber)':'var(--red)'}">${s}</div><div style="font-size:.65rem;color:var(--t3);font-family:'DM Mono',monospace">Q${i+1}</div></div>`).join('')}
+    </div>
+    <button class="btn-primary" onclick="document.getElementById('interview-setup').style.display='';document.getElementById('interview-done').style.display='none'">Try Again →</button>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+//  VERIFY
+// ══════════════════════════════════════════════════════════
+const VERIFIED = new Set(['Python','JavaScript','React']);
+let vState = {skill:'', answers:{}};
+function renderVerify() {
+  const skills = ['Python','JavaScript','React','Node.js','SQL','MongoDB','Docker','Machine Learning','REST APIs','Git','AWS','System Design'];
+  document.getElementById('verify-skill-buttons').innerHTML = skills.map(s=>{
+    const done = VERIFIED.has(s);
+    return `<button onclick="${done?'':''}" ${done?'disabled':''} ${!done?`onclick="startVerify('${s}')"`:''} style="padding:7px 16px;border-radius:99px;font-size:.83rem;font-weight:500;background:${done?'var(--gdim)':'var(--bg3)'};color:${done?'var(--green)':'var(--t2)'};border:1px solid ${done?'rgba(74,222,128,.3)':'var(--border)'};cursor:${done?'default':'pointer'};transition:all .15s"${!done?` onmouseenter="this.style.borderColor='var(--b2)';this.style.color='var(--text)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--t2)'"`:''} >${done?`✓ ${s}`:s}</button>`;
+  }).join('');
+}
+function startVerify(skill) {
+  if(!skill.trim()) return;
+  vState = {skill: skill.trim(), answers:{}};
+  const qs = VERIFY_QS[skill] || VERIFY_QS.default;
+  document.getElementById('verify-select').style.display  = 'none';
+  document.getElementById('verify-result').style.display  = 'none';
+  document.getElementById('verify-quiz').style.display    = '';
+  renderQuiz(qs);
+}
+function renderQuiz(qs) {
+  document.getElementById('verify-quiz').innerHTML = `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="font-size:.85rem;color:var(--t2)">Verifying: <strong style="color:var(--cyan)">${vState.skill}</strong></div>
+    <div id="q-answered-count" style="font-size:.75rem;color:var(--t3);font-family:'DM Mono',monospace">0/${qs.length} answered</div>
+  </div>
+  ${qs.map((q,qi)=>`
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-size:.75rem;color:var(--t3);font-family:'DM Mono',monospace;margin-bottom:8px">Q${qi+1}</div>
+    <p style="margin:0 0 14px;font-weight:500;line-height:1.6">${q.q}</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${q.opts.map((opt,oi)=>`<button id="opt-${q.id}-${oi}" onclick="selectOpt('${q.id}',${oi},${qs.length})" style="padding:10px 14px;border-radius:8px;text-align:left;font-size:.87rem;background:var(--bg3);color:var(--t2);border:1px solid var(--border);transition:all .15s"><span style="font-family:'DM Mono',monospace;color:var(--t3);margin-right:8px;font-size:.78rem">${String.fromCharCode(65+oi)}.</span>${opt}</button>`).join('')}
+    </div>
+  </div>`).join('')}
+  <div style="display:flex;gap:10px">
+    <button id="submit-quiz-btn" class="btn-primary" onclick="submitQuiz(${JSON.stringify(qs).replace(/"/g,'&quot;')})" disabled style="display:flex;align-items:center;gap:8px">Submit Answers →</button>
+    <button class="btn-ghost" onclick="document.getElementById('verify-select').style.display='';document.getElementById('verify-quiz').style.display='none'" style="font-size:.83rem">Cancel</button>
+  </div>`;
+}
+function selectOpt(qid, oi, total) {
+  vState.answers[qid] = oi;
+  // Update button styles for this question
+  document.querySelectorAll(`[id^="opt-${qid}-"]`).forEach((btn,i)=>{
+    const sel = i===oi;
+    btn.style.background = sel?'var(--cdim)':'var(--bg3)';
+    btn.style.color       = sel?'var(--cyan)':'var(--t2)';
+    btn.style.border      = `1px solid ${sel?'var(--cyan)':'var(--border)'}`;
+    btn.style.fontWeight  = sel?'600':'400';
+  });
+  const answered = Object.keys(vState.answers).length;
+  document.getElementById('q-answered-count').textContent = `${answered}/${total} answered`;
+  if(answered >= total) document.getElementById('submit-quiz-btn').disabled = false;
+}
+function submitQuiz(qs) {
+  let correct = 0;
+  qs.forEach(q=>{ if(vState.answers[q.id]===q.ans) correct++; });
+  const pct = Math.round((correct/qs.length)*100);
+  const passed = pct >= 60;
+  document.getElementById('verify-quiz').style.display = 'none';
+  document.getElementById('verify-result').style.display = '';
+  document.getElementById('verify-result').innerHTML = `
+  <div class="card fade-up" style="max-width:460px;margin:0 auto;text-align:center;padding:36px 28px;border-color:${passed?'rgba(74,222,128,.4)':'rgba(248,113,113,.3)'}">
+    <div style="font-size:52px;margin-bottom:12px">${passed?'✅':'❌'}</div>
+    <h3 style="color:${passed?'var(--green)':'var(--red)'};margin-bottom:8px">${passed?`${vState.skill} Verified!`:'Not Yet Verified'}</h3>
+    <div style="font-size:1.8rem;font-weight:800;font-family:'Syne',sans-serif;color:${passed?'var(--green)':'var(--red)'};margin-bottom:4px">${correct}/${qs.length}</div>
+    <div style="font-size:.83rem;color:var(--t3);margin-bottom:8px">${pct}% correct</div>
+    <p style="font-size:.88rem;margin-bottom:20px">${passed?`Outstanding! You've earned the verified badge for ${vState.skill}. It's now displayed on your profile.`:'You need 60% to pass. Review the concepts and try again — you almost made it!'}</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      ${!passed?`<button class="btn-primary" onclick="startVerify('${vState.skill}')">Try Again →</button>`:''}
+      <button class="btn-ghost" onclick="document.getElementById('verify-select').style.display='';document.getElementById('verify-result').style.display='none'">Verify Another Skill</button>
+    </div>
+  </div>`;
+  if(passed) toast(`${vState.skill} verified! Badge added to profile 🏅`, 'success');
+}
+
+// ══════════════════════════════════════════════════════════
+//  PROFILE
+// ══════════════════════════════════════════════════════════
+function simulateUpload(e) {
+  e.preventDefault ? e.preventDefault() : null;
+  const file = e.dataTransfer ? e.dataTransfer.files[0] : (e.target.files ? e.target.files[0] : null);
+  if(!file && !e.dataTransfer) { simulateFakeUpload(); return; }
+  simulateFakeUpload();
+}
+function simulateFakeUpload() {
+  const drop = document.getElementById('resume-drop');
+  drop.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:12px"><div style="display:flex;align-items:center;gap:10px;color:var(--cyan);font-size:.88rem;font-weight:500"><div class="spinner"></div> Analyzing resume with AI...</div><div style="width:100%;max-width:260px;height:4px;background:var(--bg4);border-radius:99px;overflow:hidden"><div id="upload-prog" style="height:100%;width:10%;background:var(--cyan);border-radius:99px;transition:width .4s ease"></div></div><div style="font-size:.72rem;color:var(--t3)">Extracting skills and checking ATS score...</div></div>`;
+  let p = 10;
+  const iv = setInterval(()=>{
+    p = Math.min(p+15, 95);
+    const bar = document.getElementById('upload-prog');
+    if(bar) bar.style.width = p+'%';
+  }, 300);
+  setTimeout(()=>{
+    clearInterval(iv);
+    drop.innerHTML = `<div style="font-size:32px;margin-bottom:8px">📄</div><div style="font-size:.9rem;font-weight:600;margin-bottom:4px">Drop your PDF resume here</div><div style="font-size:.75rem;color:var(--t3);margin-bottom:16px">PDF only · Max 5 MB · AI extracts your skills automatically</div><label style="display:inline-flex;align-items:center;gap:8px;background:var(--cyan);color:#020810;font-weight:700;font-size:.83rem;padding:10px 22px;border-radius:9px;cursor:pointer" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'">📂 Browse & Upload PDF<input type="file" accept=".pdf" style="display:none" onchange="simulateUpload(event)"/></label><div style="margin-top:10px"><span class="badge" style="background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.28)">✓ Resume on file — upload again to update</span></div>`;
+    const skills = ['Python','FastAPI','MongoDB','REST APIs','Git','React','Node.js','SQL','Docker','Linux'];
+    const result = document.getElementById('resume-result');
+    result.innerHTML = `<div style="font-size:.65rem;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Skills extracted from your resume</div><div style="display:flex;flex-wrap:wrap;gap:6px">${skills.map(s=>badge(s,'green')).join('')}</div><div style="margin-top:10px;border-top:1px solid rgba(74,222,128,.2);padding-top:10px"><div style="font-size:.65rem;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Improvement Tips</div><div style="font-size:.8rem;color:var(--t2);margin-bottom:5px;display:flex;gap:7px"><span style="color:var(--amber);flex-shrink:0">→</span>Add Docker and Kubernetes experience to boost ATS score for DevOps roles</div><div style="font-size:.8rem;color:var(--t2);margin-bottom:5px;display:flex;gap:7px"><span style="color:var(--amber);flex-shrink:0">→</span>Include quantified metrics (e.g., "reduced API latency by 40%")</div></div>`;
+    result.style.display = '';
+    toast('Resume analyzed — 10 skills extracted · Resume: 70% · ATS: 82%', 'success');
+  }, 2000);
+}
+function simulateGitHub() {
+  const btn = event.currentTarget || event.target;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:14px;height:14px"></span> Scanning...';
+  setTimeout(()=>{
+    btn.disabled = false; btn.innerHTML = 'Scan Repos →';
+    document.getElementById('github-result').style.display = 'flex';
+    toast('GitHub scanned — 24 repos · Score: 72%', 'success');
+  }, 1800);
+}
+
+// ══════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════
+// Fix page-hidden for chat (it needs special display:flex)
+document.getElementById('page-chat').style.display = 'none';
+
+</script>
+</body>
+</html>
